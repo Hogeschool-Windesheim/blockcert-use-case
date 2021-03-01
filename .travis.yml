@@ -6,6 +6,6 @@ services:
 node_js:
   - "14"
 before_script:
-  - git clone https://github.com/Hogeschool-Windesheim/Blockcert-Demo.git
+  - git clone https://github.com/Harbar-Inbound/PotCert.git
   - cd Blockert-Demo
   - ./bootstrap.sh
