@@ -12,6 +12,6 @@ services:
 node_js:
   - "14"
 before_script:
-  - git clone https://github.com/$OWNER/$PROJECT.git
+  - git clone "https://github.com/${OWNER}/${PROJECT}.git"
   - cd $PROJECT
   - ./bootstrap.sh
