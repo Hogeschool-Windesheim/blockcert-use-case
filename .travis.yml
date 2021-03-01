@@ -2,8 +2,8 @@ language: node_js
 
 env:
   global:
-    - PROJECT=PotCert
-    - OWNER="Harbar-Inbound"
+    - PROJECT="Hogeschool-Windesheim"
+    - OWNER="Blockcert-Demo"
     - SH=bash
     - PACKAGE_VERSION="1.0.*"
   
