@@ -1,4 +1,7 @@
-# BlockcertDemo
+# Blockcert-Demo
+
+## Built Status
+[![Build Status](https://travis-ci.com/Hogeschool-Windesheim/Blockcert-Demo.svg?token=abGHqhY1JBKsfJ99KknK&amp;branch=main)](https://travis-ci.com/github/Hogeschool-Windesheim/Blockcert-Demo)
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 11.2.3.
 
