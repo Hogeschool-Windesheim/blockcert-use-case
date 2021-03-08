@@ -1,0 +1,20 @@
+<div class="wrapper">
+    <mat-accordion>
+        <div *ngFor="let certificate of certificates">
+            <mat-expansion-panel hideToggle>
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        Certificate {{certificate.id}}
+                    </mat-panel-title>
+                    <mat-panel-description *ngIf="certificate.revoked">
+                        This certificate is not valid anymore
+                    </mat-panel-description>
+                    <mat-panel-description *ngIf="!certificate.revoked">
+                        This certificate is valid until {{certificate.revokeDate | date}}
+                    </mat-panel-description>
+                </mat-expansion-panel-header>
+                <p>This is the primary content of the panel.</p>
+            </mat-expansion-panel>
+        </div>
+    </mat-accordion>
+</div>
