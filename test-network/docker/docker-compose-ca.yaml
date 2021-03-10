@@ -60,8 +60,10 @@ services:
       - "11054:11054"
     command: sh -c 'fabric-ca-server start -b admin:adminpw -d'
     volumes:
-      - ../fabric-ca/org3:/etc/hyperledger/fabric-ca-server
+      - ../organizations/fabric-ca/org3:/etc/hyperledger/fabric-ca-server
     container_name: ca_org3
+    networks:
+      - test
 
   ca_orderer:
     image: hyperledger/fabric-ca:latest
