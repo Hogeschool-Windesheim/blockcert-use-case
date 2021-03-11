@@ -4,6 +4,19 @@
 
 import {Context, Contract, Info, Returns, Transaction} from 'fabric-contract-api';
 import {Certificate} from './certificate';
+import { CertificateList } from './certificateList';
+
+export class CertificateContext extends Context {
+    
+    certificateList: CertificateList;
+    
+    constructor() {
+        super();
+        // All papers are held in a list of papers
+        this.certificateList = new CertificateList(this);
+    }
+}
+
 
 @Info({title: 'CertificateTransfer', description: 'Smart contract for trading certificates'})
 export class CertificateTransferContract extends Contract {
@@ -11,7 +24,7 @@ export class CertificateTransferContract extends Contract {
     @Transaction()
     public async InitLedger(ctx: Context): Promise<void> {
         const certificates: Certificate[] = [
-            {
+            new Certificate({
                 ID: '1',
                 StartDate: 'startDate',
                 EndDate: 'endDate',
@@ -20,8 +33,8 @@ export class CertificateTransferContract extends Contract {
                 Address: 'address',
                 RegistrationNr: 'registrationNr',
                 State: 'ISSUED'
-            },
-            {
+            }),
+            new Certificate({
                 ID: '2',
                 StartDate: 'startDate2',
                 EndDate: 'endDate2',
@@ -30,7 +43,7 @@ export class CertificateTransferContract extends Contract {
                 Address: 'address2',
                 RegistrationNr: 'registrationNr2',
                 State: 'REVOKED'
-            },
+            }),
         ];
 
         for (const certificate of certificates) {
@@ -55,6 +68,8 @@ export class CertificateTransferContract extends Contract {
             RegistrationNr: registrationNr,
             State: state
         };
+        
+
         await ctx.stub.putState(id, Buffer.from(JSON.stringify(certificate)));
     }
 
@@ -121,26 +136,88 @@ export class CertificateTransferContract extends Contract {
     }
 
     // GetAllCertificates returns all certificates found in the world state.
+    // @Transaction(false)
+    // @Returns('string')
+    // public async GetAllCertificates(ctx: Context): Promise<string> {
+    //     return "test";
+    //     const allResults = [];
+    //     // range query with empty string for startKey and endKey does an open-ended query of all certificates in the chaincode namespace.
+    //     const iterator = await ctx.stub.getStateByRange('', '');
+    //     let result = await iterator.next();
+    //     while (!result.done) {
+    //         const strValue = Buffer.from(result.value.value.toString()).toString('utf8');
+    //         let record;
+    //         try {
+    //             record = JSON.parse(strValue);
+    //         } catch (err) {
+    //             console.log(err);
+    //             record = strValue;
+    //         }
+    //         allResults.push({Key: result.value.key, Record: record});
+    //         result = await iterator.next();
+    //     }
+    //     return JSON.stringify(allResults);
+    // }
+
+
     @Transaction(false)
-    @Returns('string')
-    public async GetAllCertificates(ctx: Context): Promise<string> {
-        const allResults = [];
-        // range query with empty string for startKey and endKey does an open-ended query of all certificates in the chaincode namespace.
-        const iterator = await ctx.stub.getStateByRange('', '');
-        let result = await iterator.next();
-        while (!result.done) {
-            const strValue = Buffer.from(result.value.value.toString()).toString('utf8');
-            let record;
-            try {
-                record = JSON.parse(strValue);
-            } catch (err) {
-                console.log(err);
-                record = strValue;
+    async getAllCertificates(iterator, isHistory) {
+        let allResults = [];
+        let res = { done: false, value: null };
+
+        while (true) {
+            res = await iterator.next();
+            let jsonRes: any = {};
+            if (res.value && res.value.value.toString()) {
+                if (isHistory && isHistory === true) {
+                    //jsonRes.TxId = res.value.tx_id;
+                    jsonRes.TxId = res.value.txId;
+                    jsonRes.Timestamp = res.value.timestamp;
+                    jsonRes.Timestamp = new Date((res.value.timestamp.seconds.low * 1000));
+                    let ms = res.value.timestamp.nanos / 1000000;
+                    jsonRes.Timestamp.setMilliseconds(ms);
+                    if (res.value.is_delete) {
+                        jsonRes.IsDelete = res.value.is_delete.toString();
+                    } else {
+                        try {
+                            jsonRes.Value = JSON.parse(res.value.value.toString('utf8'));
+                            // report the commercial paper states during the asset lifecycle, just for asset history reporting
+                            switch (jsonRes.Value.currentState) {
+                                case 1:
+                                    jsonRes.Value.currentState = 'ISSUED';
+                                    break;
+                                case 2:
+                                    jsonRes.Value.currentState = 'REVOKED';
+                                    break;
+                                default: // else, unknown named query
+                                    jsonRes.Value.currentState = 'UNKNOWN';
+                            }
+
+                        } catch (err) {
+                            console.log(err);
+                            jsonRes.Value = res.value.value.toString('utf8');
+                        }
+                    }
+                } else { // non history query ..
+                    jsonRes.Key = res.value.key;
+                    try {
+                        jsonRes.Record = JSON.parse(res.value.value.toString('utf8'));
+                    } catch (err) {
+                        console.log(err);
+                        jsonRes.Record = res.value.value.toString('utf8');
+                    }
+                }
+                allResults.push(jsonRes);
             }
-            allResults.push({Key: result.value.key, Record: record});
-            result = await iterator.next();
-        }
-        return JSON.stringify(allResults);
+            // check to see if we have reached the end
+            if (res.done) {
+                // explicitly close the iterator 
+                console.log('iterator is done');
+                await iterator.close();
+                return allResults;
+            }
+
+        }  // while true
     }
 
     private checkCertificateState(state: string){
