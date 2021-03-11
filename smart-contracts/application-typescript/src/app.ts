@@ -171,13 +171,12 @@ async function main() {
             app.get('/users', async (req, res) => {
                 result = await contract.evaluateTransaction('GetAllCertificates');
                 console.log(result);
+                res.setHeader('Access-Control-Allow-Origin', '*');
                 res.json({
                     success: true,
-                    message: result,
+                    message: JSON.parse(result.toString()),
                 });
             });
-
-
         } finally {
             // Disconnect from the gateway when the application is closing
             // This will close all connections to the network

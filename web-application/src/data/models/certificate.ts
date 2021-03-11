@@ -1,10 +1,15 @@
+
 export class Certificate {
-  id = 1;
-  revoked = false;
-  revokeDate: Date = new Date();
+    ID = 1;
+    CertNr = '';
+    StartDate: Date = new Date();
+    EndDate: Date = new Date();
+    Address = '';
+    Acquirer = '';
+    RegistrationNr = '';
+    State = '';
 
-  contructor(): Certificate {
-    return this;
-  }
-
+    contructor(): Certificate {
+        return this;
+    }
 }
