@@ -12,7 +12,7 @@ import {Certificate} from './certificate';
 export class CertificateList extends StateList {
 
     constructor(ctx) {
-        super(ctx, 'org.livinglab.Certificate');
+        super(ctx, 'org.livinglab.certificate');
         this.use(Certificate);
     }
 

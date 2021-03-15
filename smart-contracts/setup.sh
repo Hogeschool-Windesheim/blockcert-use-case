@@ -1,3 +1,5 @@
+export PATH=$PATH:~/fabric-samples/bin
+
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "${DIR}/../test-network/"
 

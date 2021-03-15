@@ -5,6 +5,7 @@
 import {Context, Contract, Info, Returns, Transaction} from 'fabric-contract-api';
 import {Certificate} from './certificate';
 import { CertificateList } from './certificateList';
+import {QueryUtils} from './queries';
 
 export class CertificateContext extends Context {
     
@@ -18,9 +19,21 @@ export class CertificateContext extends Context {
 }
 
 
+
 @Info({title: 'CertificateTransfer', description: 'Smart contract for trading certificates'})
 export class CertificateTransferContract extends Contract {
 
+
+    constructor() {
+        super('org.livinglab.certificate')
+    }
+
+
+    createContext() {
+        return new CertificateContext();
+    }
+
+    
     @Transaction()
     public async InitLedger(ctx: Context): Promise<void> {
         const certificates: Certificate[] = [
@@ -52,6 +65,16 @@ export class CertificateTransferContract extends Contract {
         }
     }
 
+
+    // ReadCertificate returns the certificate stored in the world state with given id.
+    @Transaction(false)
+    public async Test(ctx: Context, id: string): Promise<string> {
+        const certificateJSON = await ctx.stub.getState(id); // get the certificate from chaincode state
+        if (!certificateJSON || certificateJSON.length === 0) {
+            throw new Error(`The certificate ${id} does not exist`);
+        }
+        return certificateJSON.toString();
+    }
 
     // CreateCertificate issues a new certificate to the world state with given details.
     @Transaction()
@@ -160,65 +183,17 @@ export class CertificateTransferContract extends Contract {
     // }
 
 
-    @Transaction(false)
-    async getAllCertificates(iterator, isHistory) {
-        let allResults = [];
-        let res = { done: false, value: null };
 
-        while (true) {
-            res = await iterator.next();
-            let jsonRes: any = {};
-            if (res.value && res.value.value.toString()) {
-                if (isHistory && isHistory === true) {
-                    //jsonRes.TxId = res.value.tx_id;
-                    jsonRes.TxId = res.value.txId;
-                    jsonRes.Timestamp = res.value.timestamp;
-                    jsonRes.Timestamp = new Date((res.value.timestamp.seconds.low * 1000));
-                    let ms = res.value.timestamp.nanos / 1000000;
-                    jsonRes.Timestamp.setMilliseconds(ms);
-                    if (res.value.is_delete) {
-                        jsonRes.IsDelete = res.value.is_delete.toString();
-                    } else {
-                        try {
-                            jsonRes.Value = JSON.parse(res.value.value.toString('utf8'));
-                            // report the commercial paper states during the asset lifecycle, just for asset history reporting
-                            switch (jsonRes.Value.currentState) {
-                                case 1:
-                                    jsonRes.Value.currentState = 'ISSUED';
-                                    break;
-                                case 2:
-                                    jsonRes.Value.currentState = 'REVOKED';
-                                    break;
-                                default: // else, unknown named query
-                                    jsonRes.Value.currentState = 'UNKNOWN';
-                            }
 
-                        } catch (err) {
-                            console.log(err);
-                            jsonRes.Value = res.value.value.toString('utf8');
-                        }
-                    }
-                } else { // non history query ..
-                    jsonRes.Key = res.value.key;
-                    try {
-                        jsonRes.Record = JSON.parse(res.value.value.toString('utf8'));
-                    } catch (err) {
-                        console.log(err);
-                        jsonRes.Record = res.value.value.toString('utf8');
-                    }
-                }
-                allResults.push(jsonRes);
-            }
-            // check to see if we have reached the end
-            if (res.done) {
-                // explicitly close the iterator 
-                console.log('iterator is done');
-                await iterator.close();
-                return allResults;
-            }
+    // @Transaction(false)
+    // public async QueryHistory(ctx: Context, id: string): Promise<string>{
+    //     return 'ok';
+    //     // let query = new QueryUtils(ctx, 'org.livinglab.certificate');
+    //     // let results = await query.getAssetHistory(id);
+    //     // return results.toString();
+    // }
 
-        }  // while true
-    }
+
 
     private checkCertificateState(state: string){
         if (state != 'ISSUED' && state != 'REVOKED'){

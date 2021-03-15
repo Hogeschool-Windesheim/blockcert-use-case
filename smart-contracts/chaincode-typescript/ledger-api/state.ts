@@ -44,12 +44,6 @@ export class State {
         return this.currentState;
     }
 
-    // not used
-/*    serialize() {
-        
-        return State.serialize(this);
-    } */
-
     /**
      * Convert object to buffer containing JSON data serialization
      * Typically used before putState()ledger API

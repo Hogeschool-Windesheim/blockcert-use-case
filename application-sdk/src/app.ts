@@ -118,6 +118,7 @@ async function main() {
 
             // Let's try a query type operation (function).
             // This will be sent to just one peer and the results will be shown.
+            /*
             console.log('\n--> Evaluate Transaction: GetAllAssets, function returns all the current assets on the ledger');
             let result = await contract.evaluateTransaction('GetAllAssets');
             console.log(`*** Result: ${prettyJSONString(result.toString())}`);
@@ -173,6 +174,11 @@ async function main() {
                     message: result,
                 });
             });
+            */
+            const result = await contract.evaluateTransaction('queryHistory', '1')
+            console.log(`*** Result: ${prettyJSONString(result.toString())}`);
+
+
         } finally {
             // Disconnect from the gateway when the application is closing
             // This will close all connections to the network
