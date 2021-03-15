@@ -2,13 +2,27 @@ app-certificates {
     div.wrapper {
         margin: 10px;
         display: block;
-        div.certificates-header {
-
-        }
     }
 
-    //background-color: #00BF9A;
     mat-accordion {
         margin: 10px;
+
+        div > .mat-expansion-panel.valid {
+            background-color: rgba(165, 214, 167, 0.5);
+        }
+
+        div > .mat-expansion-panel {
+            background-color: rgba(255, 121, 97, 0.5);
+
+            .mat-expansion-panel-header > span {
+                user-select: none;
+                display: grid;
+                grid-template-columns: 1fr 2fr;
+            }
+        }
+
+        .mat-expansion-panel-body {
+            padding: 16px 24px 16px;
+        }
     }
 }

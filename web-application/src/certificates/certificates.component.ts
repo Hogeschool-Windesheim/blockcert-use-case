@@ -12,10 +12,18 @@ export class CertificatesComponent implements OnInit {
     certificates: Certificate[] = [];
 
     constructor(private _certificateService: CertificateService) {
-        this.certificates = this._certificateService.getAll();
     }
 
     ngOnInit(): void {
+        this._certificateService.getAll().then((certificates) => (this.certificates = certificates));
+    }
+
+    getValidLabel(certificate: Certificate): string {
+        if (certificate.StartDate < new Date() && certificate.EndDate > new Date()) {
+            return `Valid until ${certificate.EndDate}`;
+        }
+
+        return 'Not valid anymore';
     }
 
 }
