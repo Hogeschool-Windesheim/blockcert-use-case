@@ -1,15 +1,12 @@
 
 export class Certificate {
-    ID = 1;
-    CertNr = '';
-    StartDate: Date = new Date();
-    EndDate: Date = new Date();
-    Address = '';
-    Acquirer = '';
-    RegistrationNr = '';
-    State = '';
-
-    contructor(): Certificate {
-        return this;
-    }
+    ID: number = null;
+    CertNr: number = null;
+    StartDate: Date = null;
+    EndDate: Date = null;
+    Address: string = null;
+    Acquirer: string = null;
+    RegistrationNr: number = null;
+    State: string = null;
+    Valid: boolean = null;
 }

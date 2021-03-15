@@ -1,11 +1,14 @@
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
 import {CertificatesComponent} from '../certificates/certificates.component';
+import {CertificateCreationComponent} from '../certificates/certificate-creation.component';
 
 const routes: Routes = [{
-    path: 'certificates', component: CertificatesComponent
+    path: 'certificate-list', component: CertificatesComponent
 }, {
-    path: '', redirectTo: '/certificates', pathMatch: 'full'
+    path: 'create-certificate', component: CertificateCreationComponent
+}, {
+    path: '', redirectTo: '/certificate-list', pathMatch: 'full'
 }];
 
 @NgModule({

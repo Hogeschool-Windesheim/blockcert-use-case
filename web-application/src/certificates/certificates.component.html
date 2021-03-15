@@ -1,16 +1,16 @@
 <div class="wrapper">
-    <mat-accordion>
+    <mat-accordion multi>
         <div *ngFor="let certificate of certificates">
-            <mat-expansion-panel hideToggle>
+            <mat-expansion-panel [class.valid]="certificate.Valid">
                 <mat-expansion-panel-header>
                     <mat-panel-title>
-                        Certificate {{certificate.ID}}
+                        Certificate {{certificate.CertNr}}
                     </mat-panel-title>
                     <mat-panel-description>
-                        {{certificate.Acquirer}} {{certificate.Address}}
+                        {{certificate.Valid ? ('Valid until ' + (certificate.EndDate | date)) : 'Not valid anymore'}}
                     </mat-panel-description>
                 </mat-expansion-panel-header>
-                <p> {{certificate.Acquirer}} {{certificate.Address}}</p>
+                <div> Certificate for {{certificate.Acquirer}} {{certificate.Address}}</div>
             </mat-expansion-panel>
         </div>
     </mat-accordion>

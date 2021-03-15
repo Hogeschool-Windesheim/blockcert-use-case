@@ -1,0 +1,7 @@
+<div class="navigation-bar" [class.closed]="!show">
+    <div *ngIf="show">
+        <nav *ngFor="let navigationItem of navigationItems">
+            <a routerLink="{{navigationItem.route}}" mat-flat-button>{{navigationItem.text}}</a>
+        </nav>
+    </div>
+</div>

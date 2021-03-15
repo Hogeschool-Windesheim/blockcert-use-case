@@ -1,8 +1,9 @@
-import {Component} from '@angular/core';
+import {Component, ViewChild} from '@angular/core';
 import {NavigationEnd, Router, RouterEvent} from '@angular/router';
 import {filter} from 'rxjs/operators';
 // @ts-ignore
 import * as _ from 'lodash';
+import {NavigationBarComponent} from './navigation-bar.component';
 
 @Component({
     selector: 'app-root',
@@ -10,6 +11,9 @@ import * as _ from 'lodash';
     styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
+    @ViewChild('barComponent')
+    navigationBar: NavigationBarComponent;
+
     title = 'Blockcert-Demo';
     currentpage = '';
 
@@ -17,6 +21,10 @@ export class AppComponent {
         this._router.events
             .pipe(filter(event => event instanceof NavigationEnd))
             .subscribe((e: any) => this._setPageState(e));
+    }
+
+    menuClick(): void {
+        this.navigationBar.toggle();
     }
 
     private _setPageState(routerEvent: NavigationEnd): void {

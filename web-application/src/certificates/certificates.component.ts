@@ -1,7 +1,6 @@
 import {Component, OnInit, ViewEncapsulation} from '@angular/core';
 import {Certificate} from '../data/models/certificate';
 import {CertificateService} from '../data/services/certificate-service';
-import * as _ from 'lodash';
 
 @Component({
     selector: 'app-certificates',
@@ -16,14 +15,15 @@ export class CertificatesComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this._certificateService.getAll().then((data: any) => {
-            console.log(data);
-            _.forEach(data.message, (datas: any) => {
-                console.log(datas['Record']);
-                this.certificates.push(datas['Record']);
-            });
-            console.log(this.certificates);
-        });
+        this._certificateService.getAll().then((certificates) => (this.certificates = certificates));
+    }
+
+    getValidLabel(certificate: Certificate): string {
+        if (certificate.StartDate < new Date() && certificate.EndDate > new Date()) {
+            return `Valid until ${certificate.EndDate}`;
+        }
+
+        return 'Not valid anymore';
     }
 
 }

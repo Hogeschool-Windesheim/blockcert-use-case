@@ -1,9 +1,12 @@
+<app-navigation-bar #barComponent></app-navigation-bar>
 <div class="header-bar">
     <div class="navigation-button">
-        <button mat-flat-button>
+        <button (click)="menuClick()" mat-flat-button>
             <mat-icon>menu</mat-icon>
         </button>
     </div>
     <div class="title">{{title}} | {{currentpage}}</div>
 </div>
+<!--<div class="side-bar"></div>-->
+<!--<app-navigation-bar #barComponent></app-navigation-bar>-->
 <router-outlet></router-outlet>
