@@ -4,6 +4,7 @@
 
 import {Context, Contract, Info, Returns, Transaction} from 'fabric-contract-api';
 import {Certificate} from './certificate';
+import {QueryUtils} from './queries';
 
 @Info({title: 'CertificateTransfer', description: 'Smart contract for trading certificates'})
 export class CertificateTransferContract extends Contract {
@@ -166,31 +167,6 @@ export class CertificateTransferContract extends Contract {
 
      // GetAllIssuedCertificates returns all currently issued certificates found in the world state.
      @Transaction(false)
-     @Returns('string')
-     public async GetAllCertificatesFromFarmer(ctx: Context, acquirer: string): Promise<string> {
-         const allResults = [];
-         // range query with empty string for startKey and endKey does an open-ended query of all certificates in the chaincode namespace.
-         const iterator = await ctx.stub.getStateByRange('', '');
-         let result = await iterator.next();
-         while (!result.done) {
-             const strValue = Buffer.from(result.value.value.toString()).toString('utf8');
-             let record: any;
-             try {
-                 record = JSON.parse(strValue);
-             } catch (err) {
-                 console.log(err);
-                 record = strValue;
-             }
-             if (record.Acquirer === acquirer){
-                 allResults.push({Key: result.value.key, Record: record});
-             }
-             result = await iterator.next();
-         }
-         return JSON.stringify(allResults);
-     }
-
-     // GetAllIssuedCertificates returns all currently issued certificates found in the world state.
-     @Transaction(false)
      @Returns('boolean')
      public async CheckCertificateFromFarmerIsIssued(ctx: Context, acquirer: string): Promise<boolean> {
          const allResults = [];
@@ -214,6 +190,36 @@ export class CertificateTransferContract extends Contract {
          return (allResults.length > 0);
      }
 
-     
+
+     /**
+    * queryOwner commercial paper: supply name of owning org, to find list of papers based on owner field
+    * @param {Context} ctx the transaction context
+    * @param {String} owner commercial paper owner
+    */
+    @Transaction(false)
+    @Returns('string')
+    public async queryOwner(ctx: Context, owner: string): Promise<string> {
+        let query = new QueryUtils(ctx);
+        let owner_results = await query.queryKeyByOwner(owner);
+
+        return owner_results;
+    }
+
+     /**
+    * queryOwner commercial paper: supply name of owning org, to find list of papers based on owner field
+    * @param {Context} ctx the transaction context
+    * @param {String} owner commercial paper owner
+    */
+      @Transaction(false)
+      @Returns('string')
+      public async queryState(ctx: Context, state: string): Promise<string> {
+          let query = new QueryUtils(ctx);
+          let owner_results = await query.queryKeyByState(state);
+  
+          return owner_results;
+      }
+
+
+
 
 }

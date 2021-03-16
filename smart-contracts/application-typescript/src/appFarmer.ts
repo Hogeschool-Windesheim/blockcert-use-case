@@ -59,7 +59,7 @@ async function main() {
             // Let's try a query type operation (function).
             // This will be sent to just one peer and the results will be shown.
             console.log('\n--> Evaluate Transaction: GetAllCertificates, function returns all the current certificates on the ledger');
-            let result = await contract.evaluateTransaction('GetAllCertificatesFromFarmer', acquirer);
+            let result = await contract.evaluateTransaction('queryOwner', acquirer);
             console.log(`*** Result: ${prettyJSONString(result.toString())}`);
 
         } finally {
