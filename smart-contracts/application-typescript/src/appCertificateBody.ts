@@ -7,15 +7,15 @@ import * as express from 'express';
 import {Gateway, GatewayOptions} from 'fabric-network';
 import {createServer} from 'http';
 import * as path from 'path';
-import {buildCCPOrg1, buildWallet, prettyJSONString} from './utils//AppUtil';
+import {buildCCPOrg2, buildWallet, prettyJSONString} from './utils//AppUtil';
 import {buildCAClient, enrollAdmin, registerAndEnrollUser} from './utils/CAUtil';
 const app = express();
 
 const channelName = 'mychannel';
 const chaincodeName = 'basic';
-const mspOrg1 = 'Org1MSP';
-const walletPath = path.join(__dirname, 'wallet');
-const org1UserId = 'appUser';
+const mspOrg2 = 'Org2MSP';
+const walletPath = path.join(__dirname, 'wallet/walletCert');
+const org2UserId = 'appUser';
 
 // pre-requisites:
 // - fabric-sample two organization test-network setup with two peers, ordering service,
@@ -67,21 +67,21 @@ const org1UserId = 'appUser';
 async function main() {
     try {
         // build an in memory object with the network configuration (also known as a connection profile)
-        const ccp = buildCCPOrg1();
+        const ccp = buildCCPOrg2();
 
         // build an instance of the fabric ca services client based on
         // the information in the network configuration
-        const caClient = buildCAClient(ccp, 'ca.org1.example.com');
+        const caClient = buildCAClient(ccp, 'ca.org2.example.com');
 
         // setup the wallet to hold the credentials of the application user
         const wallet = await buildWallet(walletPath);
 
         // in a real application this would be done on an administrative flow, and only once
-        await enrollAdmin(caClient, wallet, mspOrg1);
+        await enrollAdmin(caClient, wallet, mspOrg2);
 
         // in a real application this would be done only when a new user was required to be added
         // and would be part of an administrative flow
-        await registerAndEnrollUser(caClient, wallet, mspOrg1, org1UserId, 'org1.department1');
+        await registerAndEnrollUser(caClient, wallet, mspOrg2, org2UserId, 'org2.department1');
 
         // Create a new gateway instance for interacting with the fabric network.
         // In a real application this would be done as the backend server session is setup for
@@ -90,7 +90,7 @@ async function main() {
 
         const gatewayOpts: GatewayOptions = {
             wallet,
-            identity: org1UserId,
+            identity: org2UserId,
             discovery: { enabled: true, asLocalhost: true }, // using asLocalhost as this gateway is using a fabric network deployed locally
         };
 
@@ -117,6 +117,7 @@ async function main() {
 
             // Let's try a query type operation (function).
             // This will be sent to just one peer and the results will be shown.
+            /*
             console.log('\n--> Evaluate Transaction: GetAllCertificates, function returns all the current certificates on the ledger');
             let result = await contract.evaluateTransaction('GetAllIssuedCertificates');
             console.log(`*** Result: ${prettyJSONString(result.toString())}`);
@@ -124,7 +125,7 @@ async function main() {
             // Now let's try to submit a transaction.
             // This will be sent to both peers and if both peers endorse the transaction, the endorsed proposal will be sent
             // to the orderer to be committed by each of the peer's to the channel ledger.
-            /*
+            
             console.log('\n--> Submit Transaction: CreateCertificate, creates new certificate');
             await contract.submitTransaction('CreateCertificate', 'certificate13', '01-10-1312', '01-13-4212', '47718', 'boer henk', 'lepellaan 13', 'isacertid', 'ISSUED');
             console.log('*** Result: committed');

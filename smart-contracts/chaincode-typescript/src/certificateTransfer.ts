@@ -16,7 +16,7 @@ export class CertificateTransferContract extends Contract {
                 StartDate: 'startDate',
                 EndDate: 'endDate',
                 CertNr: 'certNr',
-                Acquirer: 'acquirer',
+                Acquirer: 'henk',
                 Address: 'address',
                 RegistrationNr: 'registrationNr',
                 State: 'ISSUED'
@@ -43,8 +43,6 @@ export class CertificateTransferContract extends Contract {
     // CreateCertificate issues a new certificate to the world state with given details.
     @Transaction()
     public async CreateCertificate(ctx: Context, id: string, startDate: string, endDate: string, certNr: string, acquirer: string, address: string, registrationNr: string, state: string): Promise<void> {
-        this.checkCertificateState(state);
-
         const certificate = {
             ID: id,
             StartDate: startDate,
@@ -71,7 +69,6 @@ export class CertificateTransferContract extends Contract {
     // UpdateCertificate updates an existing certificate in the world state with provided parameters.
     @Transaction()
     public async UpdateCertificate(ctx: Context, id: string, startDate: string, endDate: string, certNr: string, acquirer: string, address: string, registrationNr: string, state: string): Promise<void> {
-        this.checkCertificateState(state)
         const exists = await this.CertificateExists(ctx, id);
         if (!exists) {
             throw new Error(`The certificate ${id} does not exist`);
@@ -113,7 +110,6 @@ export class CertificateTransferContract extends Contract {
     // UpdateState updates the state field of certificate with given id in the world state.
     @Transaction()
     public async UpdateState(ctx: Context, id: string, state: string): Promise<void> {
-        this.checkCertificateState(state)
         const certificateString = await this.ReadCertificate(ctx, id);
         const certificate = JSON.parse(certificateString);
         certificate.State = state;
@@ -143,10 +139,81 @@ export class CertificateTransferContract extends Contract {
         return JSON.stringify(allResults);
     }
 
-    private checkCertificateState(state: string){
-        if (state != 'ISSUED' && state != 'REVOKED'){
-            throw new Error('The certificate does not have a valid State')
+    // GetAllIssuedCertificates returns all currently issued certificates found in the world state.
+    @Transaction(false)
+    @Returns('string')
+    public async GetAllIssuedCertificates(ctx: Context): Promise<string> {
+        const allResults = [];
+        // range query with empty string for startKey and endKey does an open-ended query of all certificates in the chaincode namespace.
+        const iterator = await ctx.stub.getStateByRange('', '');
+        let result = await iterator.next();
+        while (!result.done) {
+            const strValue = Buffer.from(result.value.value.toString()).toString('utf8');
+            let record: any;
+            try {
+                record = JSON.parse(strValue);
+            } catch (err) {
+                console.log(err);
+                record = strValue;
+            }
+            if (record.State === 'ISSUED'){
+                allResults.push({Key: result.value.key, Record: record});
+            }
+            result = await iterator.next();
         }
+        return JSON.stringify(allResults);
     }
+
+     // GetAllIssuedCertificates returns all currently issued certificates found in the world state.
+     @Transaction(false)
+     @Returns('string')
+     public async GetAllCertificatesFromFarmer(ctx: Context, acquirer: string): Promise<string> {
+         const allResults = [];
+         // range query with empty string for startKey and endKey does an open-ended query of all certificates in the chaincode namespace.
+         const iterator = await ctx.stub.getStateByRange('', '');
+         let result = await iterator.next();
+         while (!result.done) {
+             const strValue = Buffer.from(result.value.value.toString()).toString('utf8');
+             let record: any;
+             try {
+                 record = JSON.parse(strValue);
+             } catch (err) {
+                 console.log(err);
+                 record = strValue;
+             }
+             if (record.Acquirer === acquirer){
+                 allResults.push({Key: result.value.key, Record: record});
+             }
+             result = await iterator.next();
+         }
+         return JSON.stringify(allResults);
+     }
+
+     // GetAllIssuedCertificates returns all currently issued certificates found in the world state.
+     @Transaction(false)
+     @Returns('boolean')
+     public async CheckCertificateFromFarmerIsIssued(ctx: Context, acquirer: string): Promise<boolean> {
+         const allResults = [];
+         // range query with empty string for startKey and endKey does an open-ended query of all certificates in the chaincode namespace.
+         const iterator = await ctx.stub.getStateByRange('', '');
+         let result = await iterator.next();
+         while (!result.done) {
+             const strValue = Buffer.from(result.value.value.toString()).toString('utf8');
+             let record: any;
+             try {
+                 record = JSON.parse(strValue);
+             } catch (err) {
+                 console.log(err);
+                 record = strValue;
+             }
+             if (record.Acquirer === acquirer && record.State === 'ISSUED'){
+                 allResults.push({Key: result.value.key, Record: record});
+             }
+             result = await iterator.next();
+         }
+         return (allResults.length > 0);
+     }
+
+     
 
 }
