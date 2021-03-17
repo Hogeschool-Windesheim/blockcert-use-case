@@ -3,9 +3,9 @@ import * as cors from 'cors';
 import * as express from 'express';
 import {Gateway, GatewayOptions} from 'fabric-network';
 import {createServer} from 'http';
-import * as _ from 'lodash';
 import * as path from 'path';
-import {buildCCPOrg1, buildWallet, prettyJSONString} from './utils//AppUtil';
+import {Certificate} from '../../chaincode-typescript/dist/certificate';
+import {buildCCPOrg1, buildWallet, prettyJSONString} from './utils/AppUtil';
 import {buildCAClient, enrollAdmin, registerAndEnrollUser} from './utils/CAUtil';
 
 const app = express();
@@ -16,7 +16,7 @@ const channelName = 'mychannel';
 const chaincodeName = 'basic';
 const mspOrg1 = 'Org1MSP';
 const walletPath = path.join(__dirname, 'wallet');
-const org1UserId = 'appUser';
+const org1UserId = 'appUser1';
 
 // pre-requisites:
 // - fabric-sample two organization test-network setup with two peers, ordering service,
@@ -176,10 +176,30 @@ async function main() {
                     message: JSON.parse(result.toString()),
                 });
             });
+            /**
+             * Register event listner to react to handle the creation of certicate.
+             * TODO: Further extend the capabilities to handle updates of certificates. This requires some level of
+             * TODO: inter-chaincode access control.
+             */
             app.put('/certificate', async (req, res) => {
-                console.log(req.body);
-                res.json(req.body);
-                console.log(_.keys(req.body));
+                // TODO: Use logging framework to keep track of events.
+                const proposal = req.body as Certificate;
+                // Request, expected type is a buffer representation of a Boolean.
+                const certificateStatusBuffer: Buffer = await contract.evaluateTransaction('CertificateExists', proposal.ID);
+                // TODO: Use proper parsing to validate request.
+                const certificateStatus: boolean = 'true' === certificateStatusBuffer.toString();
+
+                if (certificateStatus) {
+                    // TODO: Update certificate according to business logic?
+                    res.json(result);
+                } else {
+                    const ignore = await contract.submitTransaction('CreateCertificate', proposal.ID, proposal.StartDate,
+                        proposal.EndDate, proposal.CertNr, proposal.Acquirer, proposal.Address, proposal.RegistrationNr,
+                        'ISSUED');
+                    // Report existence back to backend
+                    const newCertificateCreated = await contract.evaluateTransaction('CertificateExists', proposal.ID);
+                    res.json({certificate: proposal, status: newCertificateCreated.toString()});
+                }
             });
         } finally {
             // Disconnect from the gateway when the application is closing
