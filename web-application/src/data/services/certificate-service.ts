@@ -11,9 +11,16 @@ import * as moment from 'moment';
 export class CertificateService {
     private _certificates: { [id: number]: Certificate } = {};
 
-    configUrl = 'http://localhost:4100/users';
+    configUrl = 'http://localhost:4100/certificate';
 
     constructor(private http: HttpClient) {
+    }
+
+    async save(certificate: Certificate): Promise<any> {
+        const body = JSON.stringify(certificate);
+        console.log(body);
+        const response = await this.http.put(this.configUrl, JSON.stringify(certificate)).toPromise();
+        console.log(response);
     }
 
     async getAll(): Promise<Certificate[]> {

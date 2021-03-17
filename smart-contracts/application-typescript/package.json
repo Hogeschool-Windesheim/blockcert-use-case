@@ -20,12 +20,16 @@
     "author": "Hyperledger",
     "license": "Apache-2.0",
     "dependencies": {
-        "@types/express": "^4.17.11",
+        "body-parser": "1.19.0",
+        "cors": "2.8.5",
         "express": "^4.17.1",
         "fabric-ca-client": "^2.2.4",
         "fabric-network": "^2.2.4"
     },
     "devDependencies": {
+        "@types/body-parser": "1.19.0",
+        "@types/cors": "2.8.10",
+        "@types/express": "^4.17.11",
         "tslint": "^5.11.0",
         "typescript": "^3.1.6"
     },

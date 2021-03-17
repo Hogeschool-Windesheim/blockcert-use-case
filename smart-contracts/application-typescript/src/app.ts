@@ -1,16 +1,16 @@
-/*
- * Copyright IBM Corp. All Rights Reserved.
- *
- * SPDX-License-Identifier: Apache-2.0
- */
+import * as bodyParser from 'body-parser';
+import * as cors from 'cors';
 import * as express from 'express';
 import {Gateway, GatewayOptions} from 'fabric-network';
 import {createServer} from 'http';
 import * as path from 'path';
 import {buildCCPOrg1, buildWallet, prettyJSONString} from './utils//AppUtil';
 import {buildCAClient, enrollAdmin, registerAndEnrollUser} from './utils/CAUtil';
-const app = express();
 
+const app = express();
+app.use(cors());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 const channelName = 'mychannel';
 const chaincodeName = 'basic';
 const mspOrg1 = 'Org1MSP';
@@ -154,7 +154,6 @@ async function main() {
             //     console.log(`*** Successfully caught the error: \n    ${error}`);
             // }
 
-
             console.log('\n--> Evaluate Transaction: ReadCertificate, function returns "certificate1" attributes');
             result = await contract.evaluateTransaction('ReadCertificate', '1');
             console.log(`*** Result: ${prettyJSONString(result.toString())}`);
@@ -168,14 +167,17 @@ async function main() {
             const server = createServer(app).listen(4100, () => {
                 console.log(`Server started on ${4100}`);
             });
-            app.get('/users', async (req, res) => {
+            app.get('/certificate', async (req, res) => {
                 result = await contract.evaluateTransaction('GetAllCertificates');
                 console.log(result);
-                res.setHeader('Access-Control-Allow-Origin', '*');
                 res.json({
                     success: true,
                     message: JSON.parse(result.toString()),
                 });
+            });
+            app.put('/certificate', async (req, res) => {
+                console.log(req.body);
+                res.sendStatus(200);
             });
         } finally {
             // Disconnect from the gateway when the application is closing
