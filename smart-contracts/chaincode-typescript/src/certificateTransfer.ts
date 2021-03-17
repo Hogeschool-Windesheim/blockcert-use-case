@@ -1,4 +1,6 @@
-/*
+/*                // return keyParts.map(part => JSON.stringify(part)).join(':');
+// return keyParts.map(part => JSON.stringify(part)).join(':');
+
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -11,7 +13,7 @@ export class CertificateTransferContract extends Contract {
     @Transaction()
     public async InitLedger(ctx: Context): Promise<void> {
         const certificates: Certificate[] = [
-            {
+            ({
                 ID: '1',
                 StartDate: 'startDate',
                 EndDate: 'endDate',
@@ -19,9 +21,9 @@ export class CertificateTransferContract extends Contract {
                 Acquirer: 'henk',
                 Address: 'address',
                 RegistrationNr: 'registrationNr',
-                State: 'ISSUED'
-            },
-            {
+                State: 'ISSUED',
+            }) as Certificate,
+            ({
                 ID: '2',
                 StartDate: 'startDate2',
                 EndDate: 'endDate2',
@@ -29,8 +31,8 @@ export class CertificateTransferContract extends Contract {
                 Acquirer: 'acquirer2',
                 Address: 'address2',
                 RegistrationNr: 'registrationNr2',
-                State: 'REVOKED'
-            },
+                State: 'REVOKED',
+            }) as Certificate,
         ];
 
         for (const certificate of certificates) {
