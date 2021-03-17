@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {Certificate} from '../models/certificate';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpHeaders} from '@angular/common/http';
 import * as _ from 'lodash';
 import {ServerResponse} from '../server-response';
 import * as moment from 'moment';
@@ -19,7 +19,9 @@ export class CertificateService {
     async save(certificate: Certificate): Promise<any> {
         const body = JSON.stringify(certificate);
         console.log(body);
-        const response = await this.http.put(this.configUrl, JSON.stringify(certificate)).toPromise();
+        const headers = new HttpHeaders();
+        headers.set('Content-Type', 'application/json; charset=utf-8');
+        const response = await this.http.put(this.configUrl, JSON.stringify(certificate), {headers: headers}).toPromise();
         console.log(response);
     }
 

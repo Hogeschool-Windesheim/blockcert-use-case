@@ -177,7 +177,7 @@ async function main() {
             });
             app.put('/certificate', async (req, res) => {
                 console.log(req.body);
-                res.sendStatus(200);
+                res.json(req.body);
             });
         } finally {
             // Disconnect from the gateway when the application is closing
