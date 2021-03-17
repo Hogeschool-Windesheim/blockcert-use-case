@@ -3,6 +3,7 @@ import * as cors from 'cors';
 import * as express from 'express';
 import {Gateway, GatewayOptions} from 'fabric-network';
 import {createServer} from 'http';
+import * as _ from 'lodash';
 import * as path from 'path';
 import {buildCCPOrg1, buildWallet, prettyJSONString} from './utils//AppUtil';
 import {buildCAClient, enrollAdmin, registerAndEnrollUser} from './utils/CAUtil';
@@ -178,6 +179,7 @@ async function main() {
             app.put('/certificate', async (req, res) => {
                 console.log(req.body);
                 res.json(req.body);
+                console.log(_.keys(req.body));
             });
         } finally {
             // Disconnect from the gateway when the application is closing
