@@ -10,24 +10,24 @@ import * as moment from 'moment';
 })
 export class CertificateService {
     private _certificates: { [id: number]: Certificate } = {};
-
-    configUrl = 'http://localhost:4100/certificate';
+    private _configUrl = 'http://localhost:4100/certificate';
+    private _httpOptions = {
+        headers: new HttpHeaders({
+            'Content-Type': 'application/json'
+        })
+    };
 
     constructor(private http: HttpClient) {
     }
 
     async save(certificate: Certificate): Promise<any> {
-        const body = JSON.stringify(certificate);
-        console.log(body);
-        const headers = new HttpHeaders();
-        headers.set('Content-Type', 'application/json; charset=utf-8');
-        const response = await this.http.put(this.configUrl, JSON.stringify(certificate), {headers: headers}).toPromise();
+        const response = await this.http.put(this._configUrl, JSON.stringify(certificate), this._httpOptions).toPromise();
         console.log(response);
     }
 
     async getAll(): Promise<Certificate[]> {
         this._certificates = {};
-        const data = await this.http.get<ServerResponse<Certificate>>(this.configUrl).toPromise();
+        const data = await this.http.get<ServerResponse<Certificate>>(this._configUrl).toPromise();
 
         _.forEach(data.message, (certificate) => this._deserialize(certificate.Record));
 
