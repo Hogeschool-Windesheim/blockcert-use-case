@@ -118,12 +118,13 @@ async function main() {
             // Let's try a query type operation (function).
             // This will be sent to just one peer and the results will be shown.
             console.log('\n--> Evaluate Transaction: GetAllCertificates, function returns all the current certificates on the ledger');
-            let result = await contract.evaluateTransaction('GetAllCertificates');
+            let result = await contract.evaluateTransaction('GetAllIssuedCertificates');
             console.log(`*** Result: ${prettyJSONString(result.toString())}`);
 
             // Now let's try to submit a transaction.
             // This will be sent to both peers and if both peers endorse the transaction, the endorsed proposal will be sent
             // to the orderer to be committed by each of the peer's to the channel ledger.
+            /*
             console.log('\n--> Submit Transaction: CreateCertificate, creates new certificate');
             await contract.submitTransaction('CreateCertificate', 'certificate13', '01-10-1312', '01-13-4212', '47718', 'boer henk', 'lepellaan 13', 'isacertid', 'ISSUED');
             console.log('*** Result: committed');
@@ -177,6 +178,7 @@ async function main() {
                     message: JSON.parse(result.toString()),
                 });
             });
+            */
         } finally {
             // Disconnect from the gateway when the application is closing
             // This will close all connections to the network
