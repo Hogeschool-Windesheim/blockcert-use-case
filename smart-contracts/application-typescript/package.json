@@ -11,7 +11,7 @@
     "scripts": {
         "lint": "tslint -c tslint.json 'src/**/*.ts'",
         "pretest": "npm run lint",
-        "start": "npm run build && node dist/app.js",
+        "start": "npm run build && node dist/appCertificateBody.js",
         "build": "tsc",
         "build:watch": "tsc -w",
         "prepublishOnly": "npm run build"
