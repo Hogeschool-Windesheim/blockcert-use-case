@@ -1,20 +1,27 @@
+import * as bodyParser from 'body-parser';
+import * as cors from 'cors';
 import * as express from 'express';
-import { Gateway, GatewayOptions } from 'fabric-network';
+import {Gateway, GatewayOptions} from 'fabric-network';
+import {createServer} from 'http';
 import * as path from 'path';
-import { buildCCPOrg3, buildWallet, prettyJSONString } from './utils//AppUtil';
-import { buildCAClient, enrollAdmin, registerAndEnrollUser } from './utils/CAUtil';
+import {buildCCPOrg3, buildWallet, prettyJSONString} from './utils//AppUtil';
+import {buildCAClient, enrollAdmin, registerAndEnrollUser} from './utils/CAUtil';
+
 const app = express();
+app.use(cors());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: false}));
 
 const channelName = 'mychannel';
 const chaincodeName = 'basic';
 const mspOrg3 = 'Org3MSP';
 const walletPath = path.join(__dirname, 'wallet/walletProducer');
 const org3UserId = 'appUser';
-const acquirer = 'henk'
+const acquirer = 'henk';
 
 /*
  * This app is meant to be run on the producer's peer. A producer is allowed to check whether or not a farmer's certificate
- * is valid or not. 
+ * is valid or not.
  */
 async function main() {
     try {
@@ -64,10 +71,20 @@ async function main() {
             let result = await contract.evaluateTransaction('CheckCertificateFromFarmerIsIssued', acquirer);
             console.log(`*** Result: ${prettyJSONString(result.toString())}`);
 
-            let result2 = await contract.evaluateTransaction('CheckCertificateFromFarmerIsIssued', 'acquirer2');
+            const result2 = await contract.evaluateTransaction('CheckCertificateFromFarmerIsIssued', 'acquirer2');
             console.log(`*** Result: ${prettyJSONString(result2.toString())}`);
 
-
+            const server = createServer(app).listen(4100, () => {
+                console.log(`Server started on ${4100}`);
+            });
+            app.get('/certificate', async (req, res) => {
+                result = await contract.evaluateTransaction('GetAllCertificates');
+                console.log(result);
+                res.json({
+                    success: true,
+                    message: JSON.parse(result.toString()),
+                });
+            });
         } finally {
             // Disconnect from the gateway when the application is closing
             // This will close all connections to the network
