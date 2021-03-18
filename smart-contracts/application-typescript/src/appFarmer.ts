@@ -1,9 +1,8 @@
 import * as express from 'express';
-import {Gateway, GatewayOptions} from 'fabric-network';
-import {createServer} from 'http';
+import { Gateway, GatewayOptions } from 'fabric-network';
 import * as path from 'path';
-import {buildCCPOrg1, buildWallet, prettyJSONString} from './utils//AppUtil';
-import {buildCAClient, enrollAdmin, registerAndEnrollUser} from './utils/CAUtil';
+import { buildCCPOrg1, buildWallet, prettyJSONString } from './utils//AppUtil';
+import { buildCAClient, enrollAdmin, registerAndEnrollUser } from './utils/CAUtil';
 const app = express();
 
 const channelName = 'mychannel';
@@ -13,6 +12,10 @@ const walletPath = path.join(__dirname, 'wallet/walletFarmer');
 const org1UserId = 'appUser';
 const acquirer = 'henk'
 
+/*
+ * This app is meant for to be run on the farmer peer. Farmers should be allowed to query their own certificates,
+ * and check whether or not he currently has a valid certificate. 
+ */
 async function main() {
     try {
         // build an in memory object with the network configuration (also known as a connection profile)
@@ -59,7 +62,7 @@ async function main() {
             // Let's try a query type operation (function).
             // This will be sent to just one peer and the results will be shown.
             console.log('\n--> Evaluate Transaction: GetAllCertificates, function returns all the current certificates on the ledger');
-            let result = await contract.evaluateTransaction('queryOwner', acquirer);
+            let result = await contract.evaluateTransaction('queryAcquirer', acquirer);
             console.log(`*** Result: ${prettyJSONString(result.toString())}`);
 
         } finally {

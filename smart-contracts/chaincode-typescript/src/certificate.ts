@@ -1,6 +1,6 @@
-import {Object, Property} from 'fabric-contract-api';
+import { Object, Property } from 'fabric-contract-api';
 
-
+// This class represents the data structure used in the blockchain
 @Object()
 export class Certificate {
 
@@ -19,9 +19,11 @@ export class Certificate {
     @Property()
     public Address: string;
 
+    // The acquirer is the owner of the certificate, e.g. a farmer
     @Property()
     public Acquirer: string;
 
+    // The registrationNr indicates the certificate body which issued a certificate
     @Property()
     public RegistrationNr: string;
 

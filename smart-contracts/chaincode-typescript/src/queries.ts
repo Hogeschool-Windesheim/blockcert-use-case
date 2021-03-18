@@ -1,30 +1,25 @@
- export class QueryUtils {
+import { Context } from 'fabric-contract-api';
 
-    ctx;
+export class QueryUtils {
+
+    ctx: Context;
     constructor(ctx) {
         this.ctx = ctx;
-        //this.supportedTypes = {};
     }
- // ===== Example: Parameterized rich query =================================================
-    // queryKeyByOwner queries for assets based on a passed in owner.
-    // This is an example of a parameterized query accepting a single query parameter (owner).
-    // Only available on state databases that support rich query (e.g. CouchDB)
-    // =========================================================================================
-    /**
-    * queryKeyByOwner commercial paper
-    * @param {String} acquirer commercial paper owner
-    */
-     async queryKeyByOwner(acquirer) {
-        //  
+
+
+    /** 
+     * Queries the ledger for all certificates with the given acquirer
+     * @param {string} acquirer owner of certificate
+     */
+    async queryKeyByAcquirer(acquirer: string) {
         let self = this;
         if (arguments.length < 1) {
-            throw new Error('Incorrect number of arguments. Expecting owner name.');
+            throw new Error('Incorrect number of arguments. Expecting acquirer name.');
         }
         let queryString: any = {};
         queryString.selector = {};
-        //  queryString.selector.docType = 'indexOwnerDoc';
         queryString.selector.Acquirer = acquirer;
-        // set to (eg)  '{selector:{owner:MagnetoCorp}}'
         let method = self.getQueryResultForQueryString;
         let queryResults = await method(this.ctx, self, JSON.stringify(queryString));
         return queryResults;
@@ -32,11 +27,48 @@
 
 
     /**
-    * queryKeyByOwner commercial paper
-    * @param {String} acquirer commercial paper owner
-    */
-     async queryKeyByState(state) {
-        //  
+     * Queries the ledger for all certificates with the given state
+     * @param {string} state the state of a certificate
+     */
+    async queryKeyByState(state: string) {
+        let self = this;
+        if (arguments.length < 1) {
+            throw new Error('Incorrect number of arguments. Expecting state name.');
+        }
+        let queryString: any = {};
+        queryString.selector = {};
+        queryString.selector.State = state;
+        let method = self.getQueryResultForQueryString;
+        let queryResults = await method(this.ctx, self, JSON.stringify(queryString));
+        return queryResults;
+    }
+
+
+    /**
+     * Queries the ledger for all certificates with the given acquirer and state
+     * @param {string} acquirer the owner of a certificate
+     * @param {string} state the state of a certificate
+     */
+    async queryByAcquirerAndState(acquirer: string, state: string) {
+        let self = this;
+        if (arguments.length < 1) {
+            throw new Error('Incorrect number of arguments. Expecting state name.');
+        }
+        let queryString: any = {};
+        queryString.selector = {};
+        queryString.selector.State = state;
+        queryString.selector.Acquirer = acquirer;
+        let method = self.getQueryResultForQueryString;
+        let queryResults = await method(this.ctx, self, JSON.stringify(queryString));
+        return queryResults;
+    }
+
+
+    /**
+     * Queries the ledger for all certificates with the given registration number
+     * @param {string} registrationNr the id of the certificate body which issued a certificate
+     */
+    async queryByRegistrationNr(registrationNr: string) {
         let self = this;
         if (arguments.length < 1) {
             throw new Error('Incorrect number of arguments. Expecting state name.');
@@ -44,42 +76,33 @@
         let queryString: any = {};
         queryString.selector = {};
         //  queryString.selector.docType = 'indexOwnerDoc';
-        queryString.selector.State = state;
+        queryString.selector.RegistrationNr = registrationNr;
         // set to (eg)  '{selector:{owner:MagnetoCorp}}'
         let method = self.getQueryResultForQueryString;
         let queryResults = await method(this.ctx, self, JSON.stringify(queryString));
         return queryResults;
     }
-    
-     
 
-      // =========================================================================================
-    // getQueryResultForQueryString woerk function executes the passed-in query string.
-    // Result set is built and returned as a byte array containing the JSON results.
-    // =========================================================================================
+
     /**
      * Function getQueryResultForQueryString
      * @param {Context} ctx the transaction context
-     * @param {any}  self within scope passed in
+     * @param {any} self within scope passed in
      * @param {String} the query string created prior to calling this fn
-    */
+     */
     async getQueryResultForQueryString(ctx, self, queryString) {
-
-        // console.log('- getQueryResultForQueryString queryString:\n' + queryString);
-
         const resultsIterator = await ctx.stub.getQueryResult(queryString);
         let results = await self.getAllResults(resultsIterator, false);
 
         return results;
-
     }
 
 
-     /**
+    /**
      * Function getAllResults
      * @param {resultsIterator} iterator within scope passed in
      * @param {Boolean} isHistory query string created prior to calling this fn
-    */
+     */
     async getAllResults(iterator, isHistory) {
         let allResults = [];
         let res = { done: false, value: null };

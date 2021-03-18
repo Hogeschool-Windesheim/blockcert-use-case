@@ -1,9 +1,8 @@
 import * as express from 'express';
-import {Gateway, GatewayOptions} from 'fabric-network';
-import {createServer} from 'http';
+import { Gateway, GatewayOptions } from 'fabric-network';
 import * as path from 'path';
-import {buildCCPOrg3, buildWallet, prettyJSONString} from './utils//AppUtil';
-import {buildCAClient, enrollAdmin, registerAndEnrollUser} from './utils/CAUtil';
+import { buildCCPOrg3, buildWallet, prettyJSONString } from './utils//AppUtil';
+import { buildCAClient, enrollAdmin, registerAndEnrollUser } from './utils/CAUtil';
 const app = express();
 
 const channelName = 'mychannel';
@@ -13,6 +12,10 @@ const walletPath = path.join(__dirname, 'wallet/walletProducer');
 const org3UserId = 'appUser';
 const acquirer = 'henk'
 
+/*
+ * This app is meant to be run on the producer's peer. A producer is allowed to check whether or not a farmer's certificate
+ * is valid or not. 
+ */
 async function main() {
     try {
         // build an in memory object with the network configuration (also known as a connection profile)
@@ -58,9 +61,12 @@ async function main() {
 
             // Let's try a query type operation (function).
             // This will be sent to just one peer and the results will be shown.
-            console.log('\n--> Evaluate Transaction: GetAllCertificates, function returns all the current certificates on the ledger');
             let result = await contract.evaluateTransaction('CheckCertificateFromFarmerIsIssued', acquirer);
             console.log(`*** Result: ${prettyJSONString(result.toString())}`);
+
+            let result2 = await contract.evaluateTransaction('CheckCertificateFromFarmerIsIssued', 'acquirer2');
+            console.log(`*** Result: ${prettyJSONString(result2.toString())}`);
+
 
         } finally {
             // Disconnect from the gateway when the application is closing
