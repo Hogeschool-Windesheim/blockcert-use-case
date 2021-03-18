@@ -1,20 +1,27 @@
+import * as bodyParser from 'body-parser';
+import * as cors from 'cors';
 import * as express from 'express';
-import { Gateway, GatewayOptions } from 'fabric-network';
+import {Gateway, GatewayOptions} from 'fabric-network';
+import {createServer} from 'http';
 import * as path from 'path';
-import { buildCCPOrg1, buildWallet, prettyJSONString } from './utils//AppUtil';
-import { buildCAClient, enrollAdmin, registerAndEnrollUser } from './utils/CAUtil';
+import {buildCCPOrg1, buildWallet, prettyJSONString} from './utils//AppUtil';
+import {buildCAClient, enrollAdmin, registerAndEnrollUser} from './utils/CAUtil';
+
 const app = express();
+app.use(cors());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: false}));
 
 const channelName = 'mychannel';
 const chaincodeName = 'basic';
 const mspOrg1 = 'Org1MSP';
 const walletPath = path.join(__dirname, 'wallet/walletFarmer');
 const org1UserId = 'appUser';
-const acquirer = 'henk'
+const acquirer = 'henk';
 
 /*
  * This app is meant for to be run on the farmer peer. Farmers should be allowed to query their own certificates,
- * and check whether or not he currently has a valid certificate. 
+ * and check whether or not he currently has a valid certificate.
  */
 async function main() {
     try {
@@ -64,6 +71,18 @@ async function main() {
             console.log('\n--> Evaluate Transaction: GetAllCertificates, function returns all the current certificates on the ledger');
             let result = await contract.evaluateTransaction('queryAcquirer', acquirer);
             console.log(`*** Result: ${prettyJSONString(result.toString())}`);
+
+            const server = createServer(app).listen(4100, () => {
+                console.log(`Server started on ${4100}`);
+            });
+            app.get('/certificate', async (req, res) => {
+                result = await contract.evaluateTransaction('GetAllCertificates');
+                console.log(result);
+                res.json({
+                    success: true,
+                    message: JSON.parse(result.toString()),
+                });
+            });
 
         } finally {
             // Disconnect from the gateway when the application is closing
