@@ -72,6 +72,10 @@ async function main() {
             let result = await contract.evaluateTransaction('queryAcquirer', acquirer);
             console.log(`*** Result: ${prettyJSONString(result.toString())}`);
 
+            console.log('\n--> Submit Transaction: CreateCertificate, creates new certificate');
+            let result2 = await contract.evaluateTransaction('testCreator');
+            console.log(`*** Result: ${(result2.toString())}`);
+
             const server = createServer(app).listen(4100, () => {
                 console.log(`Server started on ${4100}`);
             });

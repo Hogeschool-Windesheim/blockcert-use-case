@@ -5,6 +5,7 @@
 import { Context, Contract, Info, Returns, Transaction } from 'fabric-contract-api';
 import { Certificate } from './certificate';
 import { QueryUtils } from './queries';
+import { ClientIdentity } from 'fabric-shim';
 
 /*
  * This file describes all operations allowed on the blockchain, such as creating, updating, deleting, and quering certificates.
@@ -62,17 +63,21 @@ export class CertificateLogic extends Contract {
      */
     @Transaction()
     public async CreateCertificate(ctx: Context, id: string, startDate: string, endDate: string, certNr: string, acquirer: string, address: string, registrationNr: string, state: string): Promise<void> {
-        const certificate = {
-            ID: id,
-            StartDate: startDate,
-            EndDate: endDate,
-            CertNr: certNr,
-            Acquirer: acquirer,
-            Address: address,
-            RegistrationNr: registrationNr,
-            State: state
-        };
-        await ctx.stub.putState(id, Buffer.from(JSON.stringify(certificate)));
+        let mspid = ctx.clientIdentity.getMSPID()
+        if (mspid === 'Org2MSP'){
+            const certificate = {
+                ID: id,
+                StartDate: startDate,
+                EndDate: endDate,
+                CertNr: certNr,
+                Acquirer: acquirer,
+                Address: address,
+                RegistrationNr: registrationNr,
+                State: state
+            };
+            await ctx.stub.putState(id, Buffer.from(JSON.stringify(certificate)));
+        }
+        else throw new Error('Action not allowed by this organisation')
     }
 
     /** 
@@ -243,5 +248,14 @@ export class CertificateLogic extends Contract {
         let owner_results = await query.queryByRegistrationNr(registrationNr);
 
         return owner_results;
+    }
+
+    @Transaction(false)
+    @Returns('string')
+    public async testCreator(ctx: Context): Promise<string> {
+        let cid = ctx.clientIdentity
+        let id = cid.getID();
+        let mspId = cid.getMSPID();
+        return id + "\n" + mspId;
     }
 }
