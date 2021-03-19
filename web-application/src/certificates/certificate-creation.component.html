@@ -1,84 +1,65 @@
 <form class="example-form">
     <mat-form-field appearance="fill">
         <mat-label>Identifier of this certificate</mat-label>
-        <input matInput [(ngModel)]="model.ID" placeholder="E.g. 1" name="ID">
+        <input (change)="onValueChange()" required matInput [(ngModel)]="model.ID" placeholder="E.g. 1" name="ID">
     </mat-form-field>
 
     <mat-form-field appearance="fill">
         <mat-label>Certification number</mat-label>
-        <input matInput [(ngModel)]="model.CertNr" placeholder="E.g. 47718" name="certification-number">
+        <input (change)="onValueChange()" required matInput [(ngModel)]="model.CertNr" placeholder="E.g. 47718"
+               name="certification-number">
     </mat-form-field>
 
     <mat-form-field appearance="fill">
         <mat-label>Starting date of the certificate</mat-label>
-        <input matInput [(ngModel)]="model.StartDate" [matDatepicker]="picker1" name="start-date">
+        <input (change)="onValueChange()" required matInput [(ngModel)]="model.StartDate" [matDatepicker]="picker1"
+               name="start-date">
         <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
         <mat-datepicker #picker1></mat-datepicker>
     </mat-form-field>
 
     <mat-form-field appearance="fill">
         <mat-label>End date of the certificate</mat-label>
-        <input matInput [(ngModel)]="model.EndDate" [matDatepicker]="picker2" name="end-date">
+        <input (change)="onValueChange()" required matInput [(ngModel)]="model.EndDate" [matDatepicker]="picker2"
+               name="end-date">
         <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
         <mat-datepicker #picker2></mat-datepicker>
     </mat-form-field>
 
     <mat-form-field appearance="fill">
         <mat-label>Name of the farmer</mat-label>
-        <input matInput [(ngModel)]="model.Acquirer" placeholder="E.g. 47718" name="acquirer">
+        <input (change)="onValueChange()" required matInput [(ngModel)]="model.Acquirer" placeholder="E.g. 47718"
+               name="acquirer">
     </mat-form-field>
 
     <mat-form-field appearance="fill">
         <mat-label>Address of the farmer</mat-label>
-        <input matInput [(ngModel)]="model.Address" placeholder="E.g. 47718" name="address">
+        <input (change)="onValueChange()" required matInput [(ngModel)]="model.Address" placeholder="E.g. 47718"
+               name="address">
     </mat-form-field>
 
     <mat-form-field appearance="fill">
         <mat-label>Registration number</mat-label>
-        <input matInput [(ngModel)]="model.RegistrationNr" placeholder="E.g. 47718" name="registration-number">
+        <input (change)="onValueChange()" required matInput [(ngModel)]="model.RegistrationNr" placeholder="E.g. 47718"
+               name="registration-number">
     </mat-form-field>
 
     <mat-form-field appearance="fill">
         <mat-label>State of this certificate</mat-label>
-        <mat-select>
+        <mat-select (selectionChange)="onValueChange()" [(ngModel)]="model.State" name="state">
             <mat-option *ngFor="let state of states" [value]="state.type">
                 {{state.type}}
             </mat-option>
         </mat-select>
     </mat-form-field>
-    <button mat-flat-button (click)="onCreate()">Create</button>
+    <div class="button-div">
+        <button mat-flat-button
+                class="update"
+                [class.valid]="isValid"
+                [disabled]="!isValid"
+                (click)="onCreate()">{{update ? 'Update' : 'Create'}}</button>
+        <button mat-flat-button *ngIf="delete"
+                class="delete">Delete
+        </button>
+    </div>
 </form>
-
-<!--<div class="wrapper">-->
-<!--    <mat-form-field appearance="fill">-->
-<!--        <mat-label>Choose a date</mat-label>-->
-<!--        <input matInput [matDatepicker]="picker">-->
-<!--        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>-->
-<!--        <mat-datepicker #picker></mat-datepicker>-->
-<!--    </mat-form-field>-->
-
-<!--    <div>{{model.Acquirer}}</div>-->
-
-<!--    <div class="form-group">-->
-<!--        <label for="name">Name</label>-->
-<!--        <input type="text" class="form-control" id="name"-->
-<!--               required-->
-<!--               [(ngModel)]="model.Acquirer" name="name">-->
-<!--    </div>-->
-
-<!--    <div class="form-group">-->
-<!--        <label for="alterEgo">Alter Ego</label>-->
-<!--        <input type="text" class="form-control" id="alterEgo"-->
-<!--               [(ngModel)]="model.CertNr" name="alterEgo">-->
-<!--    </div>-->
-
-<!--    <div class="form-group">-->
-<!--        <label for="power">Hero Power</label>-->
-<!--        <select class="form-control" id="power"-->
-<!--                required-->
-<!--                [(ngModel)]="model.RegistrationNr" name="power">-->
-<!--            &lt;!&ndash;    <option *ngFor="let pow of powers" [value]="pow">{{pow}}</option>&ndash;&gt;-->
-<!--        </select>-->
-<!--    </div>-->
-
-<!--</div>-->

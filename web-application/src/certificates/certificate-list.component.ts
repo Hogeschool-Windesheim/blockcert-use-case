@@ -3,12 +3,12 @@ import {Certificate} from '../data/models/certificate';
 import {CertificateService} from '../data/services/certificate-service';
 
 @Component({
-    selector: 'app-certificates',
-    templateUrl: './certificates.component.html',
-    styleUrls: ['./certificates.component.scss'],
+    selector: 'certificate-list',
+    templateUrl: './certificate-list.component.html',
+    styleUrls: ['./certificate-list.component.scss'],
     encapsulation: ViewEncapsulation.None
 })
-export class CertificatesComponent implements OnInit {
+export class CertificateListComponent implements OnInit {
     certificates: Certificate[] = [];
 
     constructor(private _certificateService: CertificateService) {
@@ -17,13 +17,4 @@ export class CertificatesComponent implements OnInit {
     ngOnInit(): void {
         this._certificateService.getAll().then((certificates) => (this.certificates = certificates));
     }
-
-    getValidLabel(certificate: Certificate): string {
-        if (certificate.StartDate < new Date() && certificate.EndDate > new Date()) {
-            return `Valid until ${certificate.EndDate}`;
-        }
-
-        return 'Not valid anymore';
-    }
-
 }
