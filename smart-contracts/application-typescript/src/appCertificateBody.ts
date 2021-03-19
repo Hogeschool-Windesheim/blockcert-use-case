@@ -112,10 +112,13 @@ async function main() {
                 const certificateStatus: boolean = 'true' === certificateStatusBuffer.toString();
 
                 if (certificateStatus) {
-                    // TODO: Update certificate according to business logic?
-                    res.json(result);
+                    await contract.submitTransaction('UpdateCertificate', proposal.ID, proposal.StartDate,
+                        proposal.EndDate, proposal.CertNr, proposal.Acquirer, proposal.Address, proposal.RegistrationNr,
+                        proposal.State);
+                    const newCertificateCreated = await contract.evaluateTransaction('CertificateExists', proposal.ID);
+                    res.json({certificate: proposal, status: newCertificateCreated.toString()});
                 } else {
-                    const ignore = await contract.submitTransaction('CreateCertificate', proposal.ID, proposal.StartDate,
+                    await contract.submitTransaction('CreateCertificate', proposal.ID, proposal.StartDate,
                         proposal.EndDate, proposal.CertNr, proposal.Acquirer, proposal.Address, proposal.RegistrationNr,
                         proposal.State);
                     // Report existence back to backend
