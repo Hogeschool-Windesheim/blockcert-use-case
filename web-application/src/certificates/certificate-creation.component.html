@@ -59,7 +59,8 @@
                 [disabled]="!isValid"
                 (click)="onCreate()">{{update ? 'Update' : 'Create'}}</button>
         <button mat-flat-button *ngIf="delete"
-                class="delete">Delete
+                class="delete"
+                (click)="onDelete()">Delete
         </button>
     </div>
 </form>

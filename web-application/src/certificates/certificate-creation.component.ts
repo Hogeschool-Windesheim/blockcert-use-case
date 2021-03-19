@@ -34,4 +34,8 @@ export class CertificateCreationComponent {
     onCreate(): void {
         this._certificateService.save(this.model);
     }
+
+    onDelete(): void {
+        this._certificateService.delete(this.model);
+    }
 }

@@ -15,6 +15,6 @@ export class CertificateListComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this._certificateService.getAll().then((certificates) => (this.certificates = certificates));
+        this._certificateService.getAll().subscribe((certificates) => (this.certificates = certificates));
     }
 }

@@ -126,6 +126,10 @@ async function main() {
                     res.json({certificate: proposal, status: newCertificateCreated.toString()});
                 }
             });
+            app.delete('/certificate', async (req, res) => {
+                const result123 = await contract.submitTransaction('DeleteCertificate', req.query.certificate.toString());
+                res.json({certificate: req.query.certificate.toString(), status: 200});
+            });
         } finally {
             // Disconnect from the gateway when the application is closing
             // This will close all connections to the network
