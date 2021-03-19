@@ -1,16 +1,17 @@
-/*
- * Copyright IBM Corp. All Rights Reserved.
- *
- * SPDX-License-Identifier: Apache-2.0
- */
+import * as bodyParser from 'body-parser';
+import * as cors from 'cors';
 import * as express from 'express';
 import {Gateway, GatewayOptions} from 'fabric-network';
 import {createServer} from 'http';
 import * as path from 'path';
-import {buildCCPOrg1, buildWallet, prettyJSONString} from './utils//AppUtil';
+import {Certificate} from '../../chaincode-typescript/dist/certificate';
+import {buildCCPOrg1, buildWallet, prettyJSONString} from './utils/AppUtil';
 import {buildCAClient, enrollAdmin, registerAndEnrollUser} from './utils/CAUtil';
-const app = express();
 
+const app = express();
+app.use(cors());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 const channelName = 'mychannel';
 const chaincodeName = 'basic';
 const mspOrg1 = 'Org1MSP';
@@ -118,12 +119,13 @@ async function main() {
             // Let's try a query type operation (function).
             // This will be sent to just one peer and the results will be shown.
             console.log('\n--> Evaluate Transaction: GetAllCertificates, function returns all the current certificates on the ledger');
-            let result = await contract.evaluateTransaction('GetAllCertificates');
+            let result = await contract.evaluateTransaction('GetAllIssuedCertificates');
             console.log(`*** Result: ${prettyJSONString(result.toString())}`);
 
             // Now let's try to submit a transaction.
             // This will be sent to both peers and if both peers endorse the transaction, the endorsed proposal will be sent
             // to the orderer to be committed by each of the peer's to the channel ledger.
+
             console.log('\n--> Submit Transaction: CreateCertificate, creates new certificate');
             await contract.submitTransaction('CreateCertificate', 'certificate13', '01-10-1312', '01-13-4212', '47718', 'boer henk', 'lepellaan 13', 'isacertid', 'ISSUED');
             console.log('*** Result: committed');
@@ -154,7 +156,6 @@ async function main() {
             //     console.log(`*** Successfully caught the error: \n    ${error}`);
             // }
 
-
             console.log('\n--> Evaluate Transaction: ReadCertificate, function returns "certificate1" attributes');
             result = await contract.evaluateTransaction('ReadCertificate', '1');
             console.log(`*** Result: ${prettyJSONString(result.toString())}`);
@@ -168,14 +169,38 @@ async function main() {
             const server = createServer(app).listen(4100, () => {
                 console.log(`Server started on ${4100}`);
             });
-            app.get('/users', async (req, res) => {
+            app.get('/certificate', async (req, res) => {
                 result = await contract.evaluateTransaction('GetAllCertificates');
                 console.log(result);
-                res.setHeader('Access-Control-Allow-Origin', '*');
                 res.json({
                     success: true,
                     message: JSON.parse(result.toString()),
                 });
+            });
+            /**
+             * Register event listner to react to handle the creation of certicate.
+             * TODO: Further extend the capabilities to handle updates of certificates. This requires some level of
+             * TODO: inter-chaincode access control.
+             */
+            app.put('/certificate', async (req, res) => {
+                // TODO: Use logging framework to keep track of events.
+                const proposal = req.body as Certificate;
+                // Request, expected type is a buffer representation of a Boolean.
+                const certificateStatusBuffer: Buffer = await contract.evaluateTransaction('CertificateExists', proposal.ID);
+                // TODO: Use proper parsing to validate request.
+                const certificateStatus: boolean = 'true' === certificateStatusBuffer.toString();
+
+                if (certificateStatus) {
+                    // TODO: Update certificate according to business logic?
+                    res.json(result);
+                } else {
+                    const ignore = await contract.submitTransaction('CreateCertificate', proposal.ID, proposal.StartDate,
+                        proposal.EndDate, proposal.CertNr, proposal.Acquirer, proposal.Address, proposal.RegistrationNr,
+                        proposal.State);
+                    // Report existence back to backend
+                    const newCertificateCreated = await contract.evaluateTransaction('CertificateExists', proposal.ID);
+                    res.json({certificate: proposal, status: newCertificateCreated.toString()});
+                }
             });
         } finally {
             // Disconnect from the gateway when the application is closing
