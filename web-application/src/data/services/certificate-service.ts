@@ -21,8 +21,9 @@ export class CertificateService {
     }
 
     async save(certificate: Certificate): Promise<any> {
-        const response = await this.http.put(this._configUrl, JSON.stringify(certificate), this._httpOptions).toPromise();
-        console.log(response);
+        const object = _.assign({}, certificate);
+        _.assign(object, {StartDate: certificate.StartDate.toISOString(), EndDate: certificate.EndDate.toISOString()});
+        await this.http.put(this._configUrl, JSON.stringify(object), this._httpOptions).toPromise();
     }
 
     async getAll(): Promise<Certificate[]> {
@@ -36,16 +37,20 @@ export class CertificateService {
     }
 
     private _checkIfValid(): void {
-        _.forEach(this._certificates, (certificate) => {
-            certificate.Valid = certificate.StartDate < new Date() && certificate.EndDate > new Date();
-        });
+        _.forEach(this._certificates, (certificate) => certificate.setValid());
     }
 
-    private _deserialize(instance: Certificate): void {
+    private _deserialize(object: Certificate): void {
+        const instance = new Certificate();
+        _.forEach(instance, (value, prop) => _.set(instance, prop, object[prop]));
         _.forEach(['StartDate', 'EndDate'], dateField => {
-            const momentDate = moment(_.get(instance, dateField), 'MM-DD-YYYY');
+            const momentDate = moment(_.get(instance, dateField));
             _.set(instance, dateField, momentDate.isValid() ? momentDate.toDate() : null);
         });
         _.set(this._certificates, instance.ID, instance);
+    }
+
+    delete(certificate: Certificate): void {
+        this.http.delete(this._configUrl + `?id=${certificate.ID}`, this._httpOptions);
     }
 }

@@ -117,13 +117,12 @@ async function main() {
                 } else {
                     const ignore = await contract.submitTransaction('CreateCertificate', proposal.ID, proposal.StartDate,
                         proposal.EndDate, proposal.CertNr, proposal.Acquirer, proposal.Address, proposal.RegistrationNr,
-                        'ISSUED');
+                        proposal.State);
                     // Report existence back to backend
                     const newCertificateCreated = await contract.evaluateTransaction('CertificateExists', proposal.ID);
                     res.json({certificate: proposal, status: newCertificateCreated.toString()});
                 }
             });
-
         } finally {
             // Disconnect from the gateway when the application is closing
             // This will close all connections to the network
