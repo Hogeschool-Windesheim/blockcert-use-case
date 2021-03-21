@@ -6,6 +6,7 @@ import { Context, Contract, Info, Returns, Transaction } from 'fabric-contract-a
 import { Certificate } from './certificate';
 import { QueryUtils } from './queries';
 import { ClientIdentity } from 'fabric-shim';
+import { AccessControll } from './AccessControll';
 
 /*
  * This file describes all operations allowed on the blockchain, such as creating, updating, deleting, and quering certificates.
@@ -63,8 +64,8 @@ export class CertificateLogic extends Contract {
      */
     @Transaction()
     public async CreateCertificate(ctx: Context, id: string, startDate: string, endDate: string, certNr: string, acquirer: string, address: string, registrationNr: string, state: string): Promise<void> {
-        let mspid = ctx.clientIdentity.getMSPID()
-        if (mspid === 'Org2MSP'){
+        const isAuthorized = AccessControll.isAuthorized(this.CreateCertificate.name, ctx.clientIdentity, null)
+        if (isAuthorized){
             const certificate = {
                 ID: id,
                 StartDate: startDate,
@@ -77,7 +78,7 @@ export class CertificateLogic extends Contract {
             };
             await ctx.stub.putState(id, Buffer.from(JSON.stringify(certificate)));
         }
-        else throw new Error('Action not allowed by this organisation')
+        else throw new Error('Action not allowed by this user')
     }
 
     /** 
@@ -107,23 +108,26 @@ export class CertificateLogic extends Contract {
      */
     @Transaction()
     public async UpdateCertificate(ctx: Context, id: string, startDate: string, endDate: string, certNr: string, acquirer: string, address: string, registrationNr: string, state: string): Promise<void> {
-        const exists = await this.CertificateExists(ctx, id);
-        if (!exists) {
-            throw new Error(`The certificate ${id} does not exist`);
+        const isAuthorized = AccessControll.isAuthorized(this.UpdateCertificate.name, ctx.clientIdentity, null)
+        if (isAuthorized){
+            const exists = await this.CertificateExists(ctx, id);
+            if (!exists) {
+                throw new Error(`The certificate ${id} does not exist`);
+            }
+            // overwriting original certificate with new certificate
+            const updatedCertificate = {
+                ID: id,
+                StartDate: startDate,
+                EndDate: endDate,
+                CertNr: certNr,
+                Acquirer: acquirer,
+                Address: address,
+                RegistrationNr: registrationNr,
+                State: state
+            };
+            return ctx.stub.putState(id, Buffer.from(JSON.stringify(updatedCertificate)));
         }
-
-        // overwriting original certificate with new certificate
-        const updatedCertificate = {
-            ID: id,
-            StartDate: startDate,
-            EndDate: endDate,
-            CertNr: certNr,
-            Acquirer: acquirer,
-            Address: address,
-            RegistrationNr: registrationNr,
-            State: state
-        };
-        return ctx.stub.putState(id, Buffer.from(JSON.stringify(updatedCertificate)));
+        else throw new Error('Action not allowed by this user')
     }
 
     /** 
@@ -133,11 +137,15 @@ export class CertificateLogic extends Contract {
      */
     @Transaction()
     public async DeleteCertificate(ctx: Context, id: string): Promise<void> {
-        const exists = await this.CertificateExists(ctx, id);
-        if (!exists) {
-            throw new Error(`The certificate ${id} does not exist`);
+        const isAuthorized = AccessControll.isAuthorized(this.DeleteCertificate.name, ctx.clientIdentity, null);
+        if (isAuthorized){
+            const exists = await this.CertificateExists(ctx, id);
+            if (!exists) {
+                throw new Error(`The certificate ${id} does not exist`);
+            }
+            return ctx.stub.deleteState(id);
         }
-        return ctx.stub.deleteState(id);
+        else throw new Error('Action not allowed by this user')
     }
 
 
@@ -209,7 +217,7 @@ export class CertificateLogic extends Contract {
 
 
     /**
-     * queryOwner commercial paper: supply name of owning org, to find list of papers based on owner field
+     * queryAcquirer returns all certificates belonging to the acquirer
      * @param {Context} ctx the transaction context
      * @param {String} acquirer the acquirer who we want to query for
      */
