@@ -16,7 +16,7 @@ const channelName = 'mychannel';
 const chaincodeName = 'basic';
 const mspOrg1 = 'Org1MSP';
 const walletPath = path.join(__dirname, 'wallet/walletFarmer');
-const org1UserId = 'appUser';
+const org1UserId = 'henk';
 const acquirer = 'henk';
 
 /*
@@ -71,10 +71,6 @@ async function main() {
             console.log('\n--> Evaluate Transaction: GetAllCertificates, function returns all the current certificates on the ledger');
             let result = await contract.evaluateTransaction('queryAcquirer', acquirer);
             console.log(`*** Result: ${prettyJSONString(result.toString())}`);
-
-            console.log('\n--> Submit Transaction: CreateCertificate, creates new certificate');
-            let result2 = await contract.evaluateTransaction('testCreator');
-            console.log(`*** Result: ${(result2.toString())}`);
 
             const server = createServer(app).listen(4100, () => {
                 console.log(`Server started on ${4100}`);
