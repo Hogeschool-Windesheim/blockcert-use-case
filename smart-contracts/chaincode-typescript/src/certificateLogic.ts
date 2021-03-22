@@ -5,7 +5,7 @@
 import { Context, Contract, Info, Returns, Transaction } from 'fabric-contract-api';
 import { Certificate } from './certificate';
 import { QueryUtils } from './queries';
-import { AccessControll } from './AccessControll';
+import { AccessControll } from './accessControll';
 
 /*
  * This file describes all operations allowed on the blockchain, such as creating, updating, deleting, and quering certificates.

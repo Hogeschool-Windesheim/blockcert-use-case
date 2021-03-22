@@ -12,5 +12,6 @@ tsc app.ts
 tsc appCertificateBody.ts
 tsc appFarmer.ts
 tsc appProducer.ts
+tsc enroll.ts
 
 rm -r wallet
