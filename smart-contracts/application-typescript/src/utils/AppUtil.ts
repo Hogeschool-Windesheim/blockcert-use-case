@@ -8,6 +8,22 @@ import { Wallet, Wallets } from 'fabric-network';
 import * as fs from 'fs';
 import * as path from 'path';
 
+const buildCCPOrg = (filePath: string): Record<string, any> => {
+    // load the common connection configuration file
+    const ccpPath = path.resolve(__dirname, filePath);
+    const fileExists = fs.existsSync(ccpPath);
+    if (!fileExists) {
+        throw new Error(`no such file or directory: ${ccpPath}`);
+    }
+    const contents = fs.readFileSync(ccpPath, 'utf8');
+
+    // build a JSON object from the file contents
+    const ccp = JSON.parse(contents);
+
+    console.log(`Loaded the network configuration located at ${ccpPath}`);
+    return ccp;
+};
+
 const buildCCPOrg1 = (): Record<string, any> => {
     // load the common connection configuration file
     const ccpPath = path.resolve(__dirname, '..', '..', '..', '..', 'test-network',
@@ -82,6 +98,7 @@ const prettyJSONString = (inputString: string): string => {
 };
 
 export {
+    buildCCPOrg,
     buildCCPOrg1,
     buildCCPOrg2,
     buildCCPOrg3,

@@ -16,7 +16,7 @@ const channelName = 'mychannel';
 const chaincodeName = 'basic';
 const mspOrg1 = 'Org1MSP';
 const walletPath = path.join(__dirname, 'wallet/walletFarmer');
-const org1UserId = 'appUser';
+const org1UserId = 'henk';
 const acquirer = 'henk';
 
 /*

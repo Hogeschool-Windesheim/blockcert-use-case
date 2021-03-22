@@ -1,19 +1,16 @@
-/*
- * SPDX-License-Identifier: Apache-2.0
- */
+import {Context, Contract, Info, Returns, Transaction} from 'fabric-contract-api';
+import {AccessControll} from './accessControll';
+import {Certificate} from './certificate';
+import {QueryUtils} from './queries';
 
-import { Context, Contract, Info, Returns, Transaction } from 'fabric-contract-api';
-import { Certificate } from './certificate';
-import { QueryUtils } from './queries';
-
-/*
+/**
  * This file describes all operations allowed on the blockchain, such as creating, updating, deleting, and quering certificates.
  */
-@Info({ title: 'CertificateLogic', description: 'Smart contract for trading certificates' })
+@Info({title: 'CertificateLogic', description: 'Smart contract for trading certificates'})
 export class CertificateLogic extends Contract {
 
-    /*
-     * This function initialized the ledger with some initial data. 
+    /**
+     * This function initialized the ledger with some initial data.
      * When moving to production, this will likely have to be altered.
      */
     @Transaction()
@@ -27,7 +24,7 @@ export class CertificateLogic extends Contract {
                 Acquirer: 'henk',
                 Address: 'address',
                 RegistrationNr: 'registrationNr',
-                State: 'ISSUED'
+                State: 'ISSUED',
             },
             {
                 ID: '2',
@@ -37,7 +34,7 @@ export class CertificateLogic extends Contract {
                 Acquirer: 'acquirer2',
                 Address: 'address2',
                 RegistrationNr: 'registrationNr2',
-                State: 'REVOKED'
+                State: 'REVOKED',
             },
         ];
 
@@ -47,8 +44,7 @@ export class CertificateLogic extends Contract {
         }
     }
 
-
-    /** 
+    /**
      * CreateCertificate issues a new certificate to the world state with given details.
      * @param {Context} ctx  the transaction context
      * @param {string} id the id of the certificate
@@ -62,20 +58,25 @@ export class CertificateLogic extends Contract {
      */
     @Transaction()
     public async CreateCertificate(ctx: Context, id: string, startDate: string, endDate: string, certNr: string, acquirer: string, address: string, registrationNr: string, state: string): Promise<void> {
-        const certificate = {
-            ID: id,
-            StartDate: startDate,
-            EndDate: endDate,
-            CertNr: certNr,
-            Acquirer: acquirer,
-            Address: address,
-            RegistrationNr: registrationNr,
-            State: state
-        };
-        await ctx.stub.putState(id, Buffer.from(JSON.stringify(certificate)));
+        const isAuthorized = AccessControll.isAuthorized(this.CreateCertificate.name, ctx.clientIdentity, null);
+        if (isAuthorized) {
+            const certificate = {
+                ID: id,
+                StartDate: startDate,
+                EndDate: endDate,
+                CertNr: certNr,
+                Acquirer: acquirer,
+                Address: address,
+                RegistrationNr: registrationNr,
+                State: state,
+            };
+            await ctx.stub.putState(id, Buffer.from(JSON.stringify(certificate)));
+        } else {
+            throw new Error('Action not allowed by this user');
+        }
     }
 
-    /** 
+    /**
      * ReadCertificate returns the certificate stored in the world state with given id.
      * @param {Context} ctx the transaction context
      * @param {string} id the id of the certificate to be read
@@ -102,39 +103,47 @@ export class CertificateLogic extends Contract {
      */
     @Transaction()
     public async UpdateCertificate(ctx: Context, id: string, startDate: string, endDate: string, certNr: string, acquirer: string, address: string, registrationNr: string, state: string): Promise<void> {
-        const exists = await this.CertificateExists(ctx, id);
-        if (!exists) {
-            throw new Error(`The certificate ${id} does not exist`);
+        const isAuthorized = AccessControll.isAuthorized(this.UpdateCertificate.name, ctx.clientIdentity, null);
+        if (isAuthorized) {
+            const exists = await this.CertificateExists(ctx, id);
+            if (!exists) {
+                throw new Error(`The certificate ${id} does not exist`);
+            }
+            // overwriting original certificate with new certificate
+            const updatedCertificate = {
+                ID: id,
+                StartDate: startDate,
+                EndDate: endDate,
+                CertNr: certNr,
+                Acquirer: acquirer,
+                Address: address,
+                RegistrationNr: registrationNr,
+                State: state,
+            };
+            return ctx.stub.putState(id, Buffer.from(JSON.stringify(updatedCertificate)));
+        } else {
+            throw new Error('Action not allowed by this user');
         }
-
-        // overwriting original certificate with new certificate
-        const updatedCertificate = {
-            ID: id,
-            StartDate: startDate,
-            EndDate: endDate,
-            CertNr: certNr,
-            Acquirer: acquirer,
-            Address: address,
-            RegistrationNr: registrationNr,
-            State: state
-        };
-        return ctx.stub.putState(id, Buffer.from(JSON.stringify(updatedCertificate)));
     }
 
-    /** 
+    /**
      * DeleteCertificate deletes an given certificate from the world state.
      * @param {Context} ctx the transaction context
      * @param {string} id the id of the certificate to be deleted
      */
     @Transaction()
     public async DeleteCertificate(ctx: Context, id: string): Promise<void> {
-        const exists = await this.CertificateExists(ctx, id);
-        if (!exists) {
-            throw new Error(`The certificate ${id} does not exist`);
+        const isAuthorized = AccessControll.isAuthorized(this.DeleteCertificate.name, ctx.clientIdentity, null);
+        if (isAuthorized) {
+            const exists = await this.CertificateExists(ctx, id);
+            if (!exists) {
+                throw new Error(`The certificate ${id} does not exist`);
+            }
+            return ctx.stub.deleteState(id);
+        } else {
+            throw new Error('Action not allowed by this user');
         }
-        return ctx.stub.deleteState(id);
     }
-
 
     /**
      * CertificateExists returns true iff certificate with given ID exists in world state.
@@ -156,10 +165,15 @@ export class CertificateLogic extends Contract {
      */
     @Transaction()
     public async UpdateState(ctx: Context, id: string, state: string): Promise<void> {
-        const certificateString = await this.ReadCertificate(ctx, id);
-        const certificate = JSON.parse(certificateString);
-        certificate.State = state;
-        await ctx.stub.putState(id, Buffer.from(JSON.stringify(certificate)));
+        const isAuthorized = AccessControll.isAuthorized(this.UpdateState.name, ctx.clientIdentity, null);
+        if (isAuthorized) {
+            const certificateString = await this.ReadCertificate(ctx, id);
+            const certificate = JSON.parse(certificateString);
+            certificate.State = state;
+            await ctx.stub.putState(id, Buffer.from(JSON.stringify(certificate)));
+        } else {
+            throw new Error('Action not allowed by this user');
+        }
     }
 
     /**
@@ -169,23 +183,28 @@ export class CertificateLogic extends Contract {
     @Transaction(false)
     @Returns('string')
     public async GetAllCertificates(ctx: Context): Promise<string> {
-        const allResults = [];
-        // range query with empty string for startKey and endKey does an open-ended query of all certificates in the chaincode namespace.
-        const iterator = await ctx.stub.getStateByRange('', '');
-        let result = await iterator.next();
-        while (!result.done) {
-            const strValue = Buffer.from(result.value.value.toString()).toString('utf8');
-            let record;
-            try {
-                record = JSON.parse(strValue);
-            } catch (err) {
-                console.log(err);
-                record = strValue;
+        const isAuthorized = AccessControll.isAuthorized(this.GetAllCertificates.name, ctx.clientIdentity, null);
+        if (isAuthorized) {
+            const allResults = [];
+            // range query with empty string for startKey and endKey does an open-ended query of all certificates in the chaincode namespace.
+            const iterator = await ctx.stub.getStateByRange('', '');
+            let result = await iterator.next();
+            while (!result.done) {
+                const strValue = Buffer.from(result.value.value.toString()).toString('utf8');
+                let record;
+                try {
+                    record = JSON.parse(strValue);
+                } catch (err) {
+                    console.log(err);
+                    record = strValue;
+                }
+                allResults.push({Key: result.value.key, Record: record});
+                result = await iterator.next();
             }
-            allResults.push({ Key: result.value.key, Record: record });
-            result = await iterator.next();
+            return JSON.stringify(allResults);
+        } else {
+            throw new Error('Action not allowed by this user');
         }
-        return JSON.stringify(allResults);
     }
 
     /**
@@ -195,53 +214,66 @@ export class CertificateLogic extends Contract {
      */
     @Transaction(false)
     @Returns('boolean')
-    public async CheckCertificateFromFarmerIsIssued(ctx: Context, acquirer: string): Promise<boolean> {
-        let query = new QueryUtils(ctx);
-        let owner_results = await query.queryByAcquirerAndState(acquirer, 'ISSUED');
+    public async CheckCertificateFromAcquirerIsIssued(ctx: Context, acquirer: string): Promise<boolean> {
+        const isAuthorized = AccessControll.isAuthorized(this.CheckCertificateFromAcquirerIsIssued.name, ctx.clientIdentity, acquirer);
+        if (isAuthorized) {
+            const query = new QueryUtils(ctx);
+            const queryResults = await query.queryByAcquirerAndState(acquirer, 'ISSUED');
 
-        return (owner_results.length > 0)
+            return (queryResults.length > 0);
+        } else {
+            throw new Error('Action not allowed by this user');
+        }
     }
 
-
     /**
-     * queryOwner commercial paper: supply name of owning org, to find list of papers based on owner field
+     * queryAcquirer returns all certificates belonging to the acquirer
      * @param {Context} ctx the transaction context
      * @param {String} acquirer the acquirer who we want to query for
      */
     @Transaction(false)
     @Returns('string')
     public async queryAcquirer(ctx: Context, acquirer: string): Promise<string> {
-        let query = new QueryUtils(ctx);
-        let owner_results = await query.queryKeyByAcquirer(acquirer);
-
-        return owner_results;
+        const isAuthorized = AccessControll.isAuthorized(this.queryAcquirer.name, ctx.clientIdentity, acquirer);
+        if (isAuthorized) {
+            const query = new QueryUtils(ctx);
+            return await query.queryKeyByAcquirer(acquirer);
+        } else {
+            throw new Error('Action not allowed by this user');
+        }
     }
 
     /**
-     * queryOwner commercial paper: supply name of owning org, to find list of papers based on owner field
+     * queryState returns all certificates having the specified state
      * @param {Context} ctx the transaction context
      * @param {String} state the state for which we are querying
      */
     @Transaction(false)
     @Returns('string')
     public async queryState(ctx: Context, state: string): Promise<string> {
-        let query = new QueryUtils(ctx);
-        let owner_results = await query.queryKeyByState(state);
-
-        return owner_results;
+        const isAuthorized = AccessControll.isAuthorized(this.queryState.name, ctx.clientIdentity, null);
+        if (isAuthorized) {
+            const query = new QueryUtils(ctx);
+            return await query.queryKeyByState(state);
+        } else {
+            throw new Error('Action not allowed by this user');
+        }
     }
 
     /**
-     * queryOwner commercial paper: supply name of owning org, to find list of papers based on owner field
+     * queryState returns all certificates issued by a certain certification body
      * @param {Context} ctx the transaction context
      * @param {String} registrationNr the registration number which we are querying
      */
     @Transaction(false)
     @Returns('string')
     public async queryRegistrationNr(ctx: Context, registrationNr: string): Promise<string> {
-        let query = new QueryUtils(ctx);
-        let owner_results = await query.queryByRegistrationNr(registrationNr);
-
-        return owner_results;
+        const isAuthorized = AccessControll.isAuthorized(this.queryRegistrationNr.name, ctx.clientIdentity, null);
+        if (isAuthorized) {
+            const query = new QueryUtils(ctx);
+            return await query.queryByRegistrationNr(registrationNr);
+        } else {
+            throw new Error('Action not allowed by this user');
+        }
     }
 }
