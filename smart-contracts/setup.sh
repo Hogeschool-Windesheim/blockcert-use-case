@@ -8,7 +8,7 @@ cd "${DIR}/../test-network/"
 
 cd "${DIR}/application-typescript/src"
 
-tsc app.ts
+
 tsc appCertificateBody.ts
 tsc appFarmer.ts
 tsc appProducer.ts
