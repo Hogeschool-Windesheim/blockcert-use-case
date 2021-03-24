@@ -258,7 +258,7 @@ export class CertificateLogic extends Contract {
      */
     @Transaction(false)
     @Returns('string')
-    public async queryState(ctx: Context, state: string): Promise<Array<any>> {
+    public async queryState(ctx: Context, state: string): Promise<any[]> {
         const isAuthorized = AccessControll.isAuthorized(this.queryState.name, ctx.clientIdentity, null);
         if (isAuthorized) {
             const query = new QueryUtils(ctx);
@@ -291,7 +291,7 @@ export class CertificateLogic extends Contract {
      * @param date the current date
      */
     @Transaction(false)
-    public async updateStateAllCertificates(ctx: Context, dateString: string): Promise<void>{
+    public async updateStateAllCertificates(ctx: Context, dateString: string): Promise<void> {
         const date = Utility.stringToDate(dateString);
         const rawResult: Array<any> = await this.queryState(ctx, 'ISSUED');
         for (let certificate of rawResult) {
