@@ -4,7 +4,7 @@ import {CertificateLogic} from './certificateLogic';
 /**
  * This class is used to regulate access controll on different functions performed on the blockchain.
  */
-export class AccessControll {
+export class AccessControl {
     static farmerOrg = 'Org1MSP';
     static certBodyOrg = 'Org2MSP';
     static producerOrg = 'Org3MSP';
@@ -61,6 +61,7 @@ export class AccessControll {
      * @param idString string representing the id of the invoker
      */
     private static getWalletId(idString: string) {
+        // TODO: Writer parser for this.
         const startIndex = idString.indexOf('CN=') + 3;
         const endIndex = idString.indexOf('::', startIndex);
         return idString.substring(startIndex, endIndex);

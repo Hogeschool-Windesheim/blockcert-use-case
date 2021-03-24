@@ -1,4 +1,5 @@
 import {Context} from 'fabric-contract-api';
+import {Iterators} from 'fabric-shim';
 
 export class QueryUtils {
 
@@ -11,7 +12,7 @@ export class QueryUtils {
      * Queries the ledger for all certificates with the given acquirer
      * @param {string} acquirer owner of certificate
      */
-    async queryKeyByAcquirer(acquirer: string) {
+    async queryKeyByAcquirer(acquirer: string): Promise<string[]> {
         const self = this;
         if (arguments.length < 1) {
             throw new Error('Incorrect number of arguments. Expecting acquirer name.');
@@ -27,7 +28,7 @@ export class QueryUtils {
      * Queries the ledger for all certificates with the given state
      * @param {string} state the state of a certificate
      */
-    async queryKeyByState(state: string) {
+    async queryKeyByState(state: string): Promise<string[]> {
         const self = this;
         if (arguments.length < 1) {
             throw new Error('Incorrect number of arguments. Expecting state name.');
@@ -44,7 +45,7 @@ export class QueryUtils {
      * @param {string} acquirer the owner of a certificate
      * @param {string} state the state of a certificate
      */
-    async queryByAcquirerAndState(acquirer: string, state: string) {
+    async queryByAcquirerAndState(acquirer: string, state: string): Promise<string[]> {
         const self = this;
         if (arguments.length < 1) {
             throw new Error('Incorrect number of arguments. Expecting state name.');
@@ -61,7 +62,7 @@ export class QueryUtils {
      * Queries the ledger for all certificates with the given registration number
      * @param {string} registrationNr the id of the certificate body which issued a certificate
      */
-    async queryByRegistrationNr(registrationNr: string) {
+    async queryByRegistrationNr(registrationNr: string): Promise<string[]> {
         const self = this;
         if (arguments.length < 1) {
             throw new Error('Incorrect number of arguments. Expecting state name.');
@@ -81,7 +82,7 @@ export class QueryUtils {
      * @param {any} self within scope passed in
      * @param {String} the query string created prior to calling this fn
      */
-    async getQueryResultForQueryString(ctx, self, queryString) {
+    async getQueryResultForQueryString(ctx, self, queryString): Promise<string[]> {
         const resultsIterator = await ctx.stub.getQueryResult(queryString);
         return await self.getAllResults(resultsIterator, false);
     }
@@ -91,7 +92,7 @@ export class QueryUtils {
      * @param {resultsIterator} iterator within scope passed in
      * @param {Boolean} isHistory query string created prior to calling this fn
      */
-    async getAllResults(iterator, isHistory) {
+    async getAllResults(iterator: Iterators.StateQueryIterator, isHistory): Promise<string[]> {
         const allResults = [];
         let res = { done: false, value: null };
 

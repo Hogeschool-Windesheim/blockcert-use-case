@@ -1,5 +1,5 @@
 import {Context, Contract, Info, Returns, Transaction} from 'fabric-contract-api';
-import {AccessControll} from './accessControll';
+import {AccessControl} from './accessControl';
 import {Certificate} from './certificate';
 import {QueryUtils} from './queries';
 
@@ -58,7 +58,7 @@ export class CertificateLogic extends Contract {
      */
     @Transaction()
     public async CreateCertificate(ctx: Context, id: string, startDate: string, endDate: string, certNr: string, acquirer: string, address: string, registrationNr: string, state: string): Promise<void> {
-        const isAuthorized = AccessControll.isAuthorized(this.CreateCertificate.name, ctx.clientIdentity, null);
+        const isAuthorized = AccessControl.isAuthorized(this.CreateCertificate.name, ctx.clientIdentity, null);
         if (isAuthorized) {
             const certificate = {
                 ID: id,
@@ -103,7 +103,7 @@ export class CertificateLogic extends Contract {
      */
     @Transaction()
     public async UpdateCertificate(ctx: Context, id: string, startDate: string, endDate: string, certNr: string, acquirer: string, address: string, registrationNr: string, state: string): Promise<void> {
-        const isAuthorized = AccessControll.isAuthorized(this.UpdateCertificate.name, ctx.clientIdentity, null);
+        const isAuthorized = AccessControl.isAuthorized(this.UpdateCertificate.name, ctx.clientIdentity, null);
         if (isAuthorized) {
             const exists = await this.CertificateExists(ctx, id);
             if (!exists) {
@@ -133,7 +133,7 @@ export class CertificateLogic extends Contract {
      */
     @Transaction()
     public async DeleteCertificate(ctx: Context, id: string): Promise<void> {
-        const isAuthorized = AccessControll.isAuthorized(this.DeleteCertificate.name, ctx.clientIdentity, null);
+        const isAuthorized = AccessControl.isAuthorized(this.DeleteCertificate.name, ctx.clientIdentity, null);
         if (isAuthorized) {
             const exists = await this.CertificateExists(ctx, id);
             if (!exists) {
@@ -165,7 +165,7 @@ export class CertificateLogic extends Contract {
      */
     @Transaction()
     public async UpdateState(ctx: Context, id: string, state: string): Promise<void> {
-        const isAuthorized = AccessControll.isAuthorized(this.UpdateState.name, ctx.clientIdentity, null);
+        const isAuthorized = AccessControl.isAuthorized(this.UpdateState.name, ctx.clientIdentity, null);
         if (isAuthorized) {
             const certificateString = await this.ReadCertificate(ctx, id);
             const certificate = JSON.parse(certificateString);
@@ -183,7 +183,7 @@ export class CertificateLogic extends Contract {
     @Transaction(false)
     @Returns('string')
     public async GetAllCertificates(ctx: Context): Promise<string> {
-        const isAuthorized = AccessControll.isAuthorized(this.GetAllCertificates.name, ctx.clientIdentity, null);
+        const isAuthorized = AccessControl.isAuthorized(this.GetAllCertificates.name, ctx.clientIdentity, null);
         if (isAuthorized) {
             const allResults = [];
             // range query with empty string for startKey and endKey does an open-ended query of all certificates in the chaincode namespace.
@@ -215,7 +215,7 @@ export class CertificateLogic extends Contract {
     @Transaction(false)
     @Returns('boolean')
     public async CheckCertificateFromAcquirerIsIssued(ctx: Context, acquirer: string): Promise<boolean> {
-        const isAuthorized = AccessControll.isAuthorized(this.CheckCertificateFromAcquirerIsIssued.name, ctx.clientIdentity, acquirer);
+        const isAuthorized = AccessControl.isAuthorized(this.CheckCertificateFromAcquirerIsIssued.name, ctx.clientIdentity, acquirer);
         if (isAuthorized) {
             const query = new QueryUtils(ctx);
             const queryResults = await query.queryByAcquirerAndState(acquirer, 'ISSUED');
@@ -233,8 +233,8 @@ export class CertificateLogic extends Contract {
      */
     @Transaction(false)
     @Returns('string')
-    public async queryAcquirer(ctx: Context, acquirer: string): Promise<string> {
-        const isAuthorized = AccessControll.isAuthorized(this.queryAcquirer.name, ctx.clientIdentity, acquirer);
+    public async queryAcquirer(ctx: Context, acquirer: string): Promise<string[]> {
+        const isAuthorized = AccessControl.isAuthorized(this.queryAcquirer.name, ctx.clientIdentity, acquirer);
         if (isAuthorized) {
             const query = new QueryUtils(ctx);
             return await query.queryKeyByAcquirer(acquirer);
@@ -250,8 +250,8 @@ export class CertificateLogic extends Contract {
      */
     @Transaction(false)
     @Returns('string')
-    public async queryState(ctx: Context, state: string): Promise<string> {
-        const isAuthorized = AccessControll.isAuthorized(this.queryState.name, ctx.clientIdentity, null);
+    public async queryState(ctx: Context, state: string): Promise<string[]> {
+        const isAuthorized = AccessControl.isAuthorized(this.queryState.name, ctx.clientIdentity, null);
         if (isAuthorized) {
             const query = new QueryUtils(ctx);
             return await query.queryKeyByState(state);
@@ -267,8 +267,8 @@ export class CertificateLogic extends Contract {
      */
     @Transaction(false)
     @Returns('string')
-    public async queryRegistrationNr(ctx: Context, registrationNr: string): Promise<string> {
-        const isAuthorized = AccessControll.isAuthorized(this.queryRegistrationNr.name, ctx.clientIdentity, null);
+    public async queryRegistrationNr(ctx: Context, registrationNr: string): Promise<string[]> {
+        const isAuthorized = AccessControl.isAuthorized(this.queryRegistrationNr.name, ctx.clientIdentity, null);
         if (isAuthorized) {
             const query = new QueryUtils(ctx);
             return await query.queryByRegistrationNr(registrationNr);
