@@ -18,6 +18,8 @@ import {MatInputModule} from '@angular/material/input';
 import {MatNativeDateModule, MatOptionModule} from '@angular/material/core';
 import {MatSelectModule} from '@angular/material/select';
 import {CertificateComponent} from '../certificates/certificate.component';
+import {CertificateCreationPageComponent} from '../certificates/certificate-creation-page.component';
+import {NavigationService} from './navigation.service';
 
 
 @NgModule({
@@ -26,7 +28,8 @@ import {CertificateComponent} from '../certificates/certificate.component';
         CertificateListComponent,
         NavigationBarComponent,
         CertificateCreationComponent,
-        CertificateComponent
+        CertificateComponent,
+        CertificateCreationPageComponent
     ],
     imports: [
         AppRoutingModule,
@@ -44,7 +47,7 @@ import {CertificateComponent} from '../certificates/certificate.component';
         MatOptionModule,
         MatSelectModule
     ],
-    providers: [MatDatepickerModule],
+    providers: [MatDatepickerModule, NavigationService],
     bootstrap: [AppComponent]
 })
 export class AppModule {
