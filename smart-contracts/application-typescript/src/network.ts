@@ -1,17 +1,7 @@
 import {Contract, Gateway, GatewayOptions, Wallet} from 'fabric-network';
 import {buildCCPOrg, buildWallet} from './utils/AppUtil';
 import {buildCAClient, enrollAdmin, registerAndEnrollUser} from './utils/CAUtil';
-
-export interface NetworkConfig {
-    caName: string;
-    chaincodeName: string;
-    channelName: string;
-    department: string;
-    filePath: string;
-    mspOrg: string;
-    userId: string;
-    walletPath: string;
-}
+import {NetworkConfig} from './utils/NetworkConfig';
 
 export class Network {
     contract: Contract;
