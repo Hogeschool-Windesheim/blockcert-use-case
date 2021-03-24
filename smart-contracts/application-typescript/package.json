@@ -11,7 +11,7 @@
     "scripts": {
         "lint": "tslint -c tslint.json 'src/**/*.ts'",
         "pretest": "npm run lint",
-        "start": "npm run build && node dist/appCertificateBody.js",
+        "start": "npm run build && node dist/appCertificateBody.js --configFile resources/certificate-body/config.json --jsonPath configuration",
         "build": "tsc",
         "build:watch": "tsc -w",
         "prepublishOnly": "npm run build"
@@ -25,7 +25,9 @@
         "express": "^4.17.1",
         "fabric-ca-client": "^2.2.4",
         "fabric-network": "^2.2.4",
-        "lodash": "4.17.21"
+        "lodash": "4.17.21",
+        "ts-command-line-args": "^1.8.1",
+        "tsc": "^1.20150623.0"
     },
     "devDependencies": {
         "@types/body-parser": "1.19.0",
