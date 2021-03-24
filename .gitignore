@@ -28,3 +28,5 @@ test-network/log.txt
 smart-contracts/**/*.js
 # exclude generated wallet
 smart-contracts/application-typescript/src/wallet/*
+
+application-sdk/dist
