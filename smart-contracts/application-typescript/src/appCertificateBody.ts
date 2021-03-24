@@ -76,15 +76,19 @@ async function main() {
             console.log('*** Result: committed');
 
             console.log('\n--> Submit Transaction: CreateCertificate, creates new certificate');
-            await contract.submitTransaction('CreateCertificate', 'certificate13', '01-10-1312', '01-13-4212', '47718', 'henk', 'lepellaan 13', 'isacertid', 'ISSUED');
+            await contract.submitTransaction('CreateCertificate', 'certificate14', '01-10-1312', '03-24-2021', '47718', 'henk', 'lepellaan 13', 'isacertid', 'ISSUED');
             console.log('*** Result: committed');
+
+            console.log('\n--> Updating state of all certificates');
+            const test = await contract.submitTransaction('updateStateAllCertificates');
+            console.log(`*** Result: ${(test.toString())}`);
 
             console.log('\n--> Evaluate Transaction: GetAllCertificates, function returns all the current certificates on the ledger');
             let result = await contract.evaluateTransaction('GetAllCertificates');
             console.log(`*** Result: ${prettyJSONString(result.toString())}`);
 
             console.log('\n--> Evaluate Transaction: queryRegistratoinNr, function which returns all certificates from a certain registrationNr')
-            let result2 = await contract.evaluateTransaction('queryRegistrationNr', registrationNr);
+            let result2 = await contract.evaluateTransaction('queryState', 'ISSUED');
             console.log(`*** Result: ${prettyJSONString(result2.toString())}`);
 
             const server = createServer(app).listen(4100, () => {
