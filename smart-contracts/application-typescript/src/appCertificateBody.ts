@@ -76,12 +76,11 @@ async function main() {
             console.log('*** Result: committed');
 
             console.log('\n--> Submit Transaction: CreateCertificate, creates new certificate');
-            await contract.submitTransaction('CreateCertificate', 'certificate13', '01-10-1312', '01-13-2019', '47718', 'henk', 'lepellaan 13', 'isacertid', 'ISSUED');
+            await contract.submitTransaction('CreateCertificate', 'certificate14', '01-10-1312', '03-24-2021', '47718', 'henk', 'lepellaan 13', 'isacertid', 'ISSUED');
             console.log('*** Result: committed');
 
             console.log('\n--> Updating state of all certificates');
-            console.log(new Date().toString())
-            const test = await contract.submitTransaction('updateStateAllCertificates', '03-22-2021');
+            const test = await contract.submitTransaction('updateStateAllCertificates');
             console.log(`*** Result: ${(test.toString())}`);
 
             console.log('\n--> Evaluate Transaction: GetAllCertificates, function returns all the current certificates on the ledger');

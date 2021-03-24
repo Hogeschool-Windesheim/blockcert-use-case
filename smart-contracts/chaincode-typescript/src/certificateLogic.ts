@@ -287,13 +287,15 @@ export class CertificateLogic extends Contract {
 
     /**
      * Function which updates all expired certificates in the ledger
+     * NOTE: this function rules certificates on the same date still as valid, 
+     * it only expires certificates with endDate < currentDate
      * @param ctx the transaction context
      * @param date the current date
      */
     @Transaction(false)
-    public async updateStateAllCertificates(ctx: Context, dateString: string): Promise<void>{
-        const date = Utility.stringToDate(dateString);
+    public async updateStateAllCertificates(ctx: Context): Promise<void>{
         const rawResult: Array<any> = await this.queryState(ctx, 'ISSUED');
+        const date = new Date()
         for (let certificate of rawResult) {
             const certDate: Date = Utility.stringToDate(certificate.Record.EndDate)
             if (certDate <= date){
