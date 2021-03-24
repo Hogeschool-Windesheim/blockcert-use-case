@@ -1,4 +1,4 @@
-app-certificates {
+certificate-list {
     div.wrapper {
         margin: 10px;
         display: block;
@@ -22,6 +22,7 @@ app-certificates {
         }
 
         .mat-expansion-panel-body {
+            background-color: white;
             padding: 16px 24px 16px;
         }
     }

@@ -3,7 +3,7 @@ import {BrowserModule} from '@angular/platform-browser';
 
 import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
-import {CertificatesComponent} from '../certificates/certificates.component';
+import {CertificateListComponent} from '../certificates/certificate-list.component';
 import {FormsModule} from '@angular/forms';
 import {MatIconModule} from '@angular/material/icon';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
@@ -15,31 +15,32 @@ import {CertificateCreationComponent} from '../certificates/certificate-creation
 import {MatDatepickerModule} from '@angular/material/datepicker';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
-import {MatMomentDateModule} from '@angular/material-moment-adapter';
-import {MatOptionModule} from '@angular/material/core';
+import {MatNativeDateModule, MatOptionModule} from '@angular/material/core';
 import {MatSelectModule} from '@angular/material/select';
+import {CertificateComponent} from '../certificates/certificate.component';
 
 
 @NgModule({
     declarations: [
         AppComponent,
-        CertificatesComponent,
+        CertificateListComponent,
         NavigationBarComponent,
-        CertificateCreationComponent
+        CertificateCreationComponent,
+        CertificateComponent
     ],
     imports: [
-        BrowserModule,
         AppRoutingModule,
-        FormsModule,
-        MatIconModule,
         BrowserAnimationsModule,
-        MatButtonModule,
-        MatExpansionModule,
+        BrowserModule,
+        FormsModule,
         HttpClientModule,
+        MatButtonModule,
         MatDatepickerModule,
-        MatFormFieldModule,
+        MatExpansionModule,
+        MatIconModule,
         MatInputModule,
-        MatMomentDateModule,
+        MatFormFieldModule,
+        MatNativeDateModule,
         MatOptionModule,
         MatSelectModule
     ],

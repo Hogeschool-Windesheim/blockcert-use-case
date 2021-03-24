@@ -10,6 +10,7 @@
       "spaces",
       4
     ],
+    "interface-name": false,
     "linebreak-style": [
       true,
       "LF"
@@ -35,8 +36,13 @@
       true,
       "as-needed"
     ],
+    "object-literal-shorthand": false,
     "object-literal-sort-keys": false,
-    "max-line-length": false
+    "max-line-length": false,
+    "member-access": false,
+    "variable-name": {
+      "options": "allow-leading-underscore"
+    }
   },
   "rulesDirectory": []
 }

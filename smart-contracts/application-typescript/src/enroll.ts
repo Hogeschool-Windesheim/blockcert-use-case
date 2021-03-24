@@ -1,14 +1,6 @@
-import * as bodyParser from 'body-parser';
-import * as cors from 'cors';
-import * as express from 'express';
 import * as path from 'path';
 import {buildCCPOrg, buildWallet} from './utils/AppUtil';
 import {buildCAClient, enrollAdmin, registerAndEnrollUser} from './utils/CAUtil';
-
-const app = express();
-app.use(cors());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: false}));
 
 const mspOrg = 'Org1MSP';
 const walletPath = path.join(__dirname, 'wallet/walletFarmer');
