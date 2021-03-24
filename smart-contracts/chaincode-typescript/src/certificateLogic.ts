@@ -1,7 +1,12 @@
-import {Context, Contract, Info, Returns, Transaction} from 'fabric-contract-api';
-import {AccessControll} from './accessControll';
-import {Certificate} from './certificate';
-import {QueryUtils} from './queries';
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+import { Context, Contract, Info, Returns, Transaction } from 'fabric-contract-api';
+import { Certificate } from './certificate';
+import { QueryUtils } from './queries';
+import { AccessControll } from './accessControll';
+import { Utility } from './utility';
 
 /**
  * This file describes all operations allowed on the blockchain, such as creating, updating, deleting, and quering certificates.
@@ -18,8 +23,8 @@ export class CertificateLogic extends Contract {
         const certificates: Certificate[] = [
             {
                 ID: '1',
-                StartDate: 'startDate',
-                EndDate: 'endDate',
+                StartDate: '03-10-2021',
+                EndDate: '03-30-2021',
                 CertNr: 'certNr',
                 Acquirer: 'henk',
                 Address: 'address',
@@ -28,13 +33,13 @@ export class CertificateLogic extends Contract {
             },
             {
                 ID: '2',
-                StartDate: 'startDate2',
-                EndDate: 'endDate2',
+                StartDate: '03-10-2021',
+                EndDate: '03-22-2021',
                 CertNr: 'certNr2',
                 Acquirer: 'acquirer2',
                 Address: 'address2',
                 RegistrationNr: 'registrationNr2',
-                State: 'REVOKED',
+                State: 'ISSUED',
             },
         ];
 
@@ -60,6 +65,7 @@ export class CertificateLogic extends Contract {
     public async CreateCertificate(ctx: Context, id: string, startDate: string, endDate: string, certNr: string, acquirer: string, address: string, registrationNr: string, state: string): Promise<void> {
         const isAuthorized = AccessControll.isAuthorized(this.CreateCertificate.name, ctx.clientIdentity, null);
         if (isAuthorized) {
+            Utility.checkStateValidity(state);
             const certificate = {
                 ID: id,
                 StartDate: startDate,
@@ -105,6 +111,7 @@ export class CertificateLogic extends Contract {
     public async UpdateCertificate(ctx: Context, id: string, startDate: string, endDate: string, certNr: string, acquirer: string, address: string, registrationNr: string, state: string): Promise<void> {
         const isAuthorized = AccessControll.isAuthorized(this.UpdateCertificate.name, ctx.clientIdentity, null);
         if (isAuthorized) {
+            Utility.checkStateValidity(state);
             const exists = await this.CertificateExists(ctx, id);
             if (!exists) {
                 throw new Error(`The certificate ${id} does not exist`);
@@ -167,6 +174,7 @@ export class CertificateLogic extends Contract {
     public async UpdateState(ctx: Context, id: string, state: string): Promise<void> {
         const isAuthorized = AccessControll.isAuthorized(this.UpdateState.name, ctx.clientIdentity, null);
         if (isAuthorized) {
+            Utility.checkStateValidity(state);
             const certificateString = await this.ReadCertificate(ctx, id);
             const certificate = JSON.parse(certificateString);
             certificate.State = state;
@@ -250,7 +258,7 @@ export class CertificateLogic extends Contract {
      */
     @Transaction(false)
     @Returns('string')
-    public async queryState(ctx: Context, state: string): Promise<string> {
+    public async queryState(ctx: Context, state: string): Promise<Array<any>> {
         const isAuthorized = AccessControll.isAuthorized(this.queryState.name, ctx.clientIdentity, null);
         if (isAuthorized) {
             const query = new QueryUtils(ctx);
@@ -275,5 +283,22 @@ export class CertificateLogic extends Contract {
         } else {
             throw new Error('Action not allowed by this user');
         }
+    }
+
+    /**
+     * Function which updates all expired certificates in the ledger
+     * @param ctx the transaction context
+     * @param date the current date
+     */
+    @Transaction(false)
+    public async updateStateAllCertificates(ctx: Context, dateString: string): Promise<void>{
+        const date = Utility.stringToDate(dateString);
+        const rawResult: Array<any> = await this.queryState(ctx, 'ISSUED');
+        for (let certificate of rawResult) {
+            const certDate: Date = Utility.stringToDate(certificate.Record.EndDate)
+            if (certDate <= date){
+                await this.UpdateState(ctx, certificate.Record.ID, 'EXPIRED')
+            }
+        };
     }
 }
