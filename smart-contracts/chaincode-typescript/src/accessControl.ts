@@ -57,9 +57,8 @@ export class AccessControl {
      * however there might exist a more elegant solution.
      * @param idString string representing the id of the invoker
      */
-    private static getWalletId(idString: string) {
-        const startIndex = idString.indexOf('CN=') + 3;
-        const endIndex = idString.indexOf('::', startIndex);
-        return idString.substring(startIndex, endIndex);
+    private static getWalletId(idString: string): string {
+        // Look forward to (?<=CN=) Then any char .* is matched until two or more ':' are encountered (?=:{2,})
+        return idString.match('(?<=CN=).*?(?=\:{2,})')[0];
     }
 }
