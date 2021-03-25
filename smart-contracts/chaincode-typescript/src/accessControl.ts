@@ -2,7 +2,7 @@ import {ClientIdentity} from 'fabric-shim';
 import {CertificateLogic} from './certificateLogic';
 
 /**
- * This class is used to regulate access controll on different functions performed on the blockchain.
+ * This class is used to regulate access control on different functions performed on the blockchain.
  */
 export class AccessControl {
     static farmerOrg = 'Org1MSP';
@@ -18,7 +18,7 @@ export class AccessControl {
      */
     static isAuthorized(methodInvoked: string, clientIdentity: ClientIdentity, queryValue: string): boolean {
         switch (methodInvoked) {
-            // Match all funcitons which only the certification body is allowed to perform
+            // Match all functions which only the certification body is allowed to perform
             case CertificateLogic.prototype.DeleteCertificate.name:
             case CertificateLogic.prototype.UpdateCertificate.name:
             case CertificateLogic.prototype.UpdateState.name:
@@ -32,7 +32,7 @@ export class AccessControl {
             // The certBody, all producers, and the acquirer of a certificate are authorized
             case CertificateLogic.prototype.CheckCertificateFromAcquirerIsIssued.name: {
                 const mspId = clientIdentity.getMSPID();
-                if (mspId === this.certBodyOrg || mspId === this.producerOrg) {
+                if (new Set([this.certBodyOrg, this.producerOrg]).has(mspId)) {
                     return true;
                 }
                 const id = this.getWalletId(clientIdentity.getID());
