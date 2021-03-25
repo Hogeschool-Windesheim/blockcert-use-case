@@ -66,7 +66,7 @@ describe('Test access control for Certification Body Only', () => {
 });
 
 describe(`Test ${CertificateLogic.prototype.CheckCertificateFromAcquirerIsIssued.name} for own identity`, () => {
-    const organisations: string[] = ['Org2MSP', 'Org3MSP'];
+    const organisations: string[] = ['Org2MSP', 'Org3MSP', 'Org1MSP'];
 
     organisations.forEach((organisation) => {
         it(`Assert access set for ${organisation}`, () => {
@@ -77,24 +77,13 @@ describe(`Test ${CertificateLogic.prototype.CheckCertificateFromAcquirerIsIssued
             expect(AccessControl.isAuthorized(CertificateLogic.prototype.CheckCertificateFromAcquirerIsIssued.name,
                 mockedIdentity, organisation)).toBe(true);
             expect(mockedIdentity.getMSPID).toBeCalledTimes(1);
-            expect(mockedIdentity.getID).toBeCalledTimes(0);
+            expect(mockedIdentity.getID).toBeCalledTimes(1);
         });
-    });
-
-    it(`Assert access set for Farmer`, () => {
-        const farmerID = 'Org1MSP';
-        setupMock.getMSPID.mockReturnValueOnce(farmerID);
-        setupMock.getID.mockReturnValueOnce(`CN=${farmerID}::`);
-        const mockedIdentity = setupMock as unknown as ClientIdentity;
-        expect(AccessControl.isAuthorized(CertificateLogic.prototype.CheckCertificateFromAcquirerIsIssued.name,
-            mockedIdentity, farmerID)).toBe(true);
-        expect(mockedIdentity.getMSPID).toBeCalledTimes(1);
-        expect(mockedIdentity.getID).toBeCalledTimes(1);
     });
 });
 
 describe(`Test ${CertificateLogic.prototype.queryAcquirer.name} for own identity`, () => {
-    const organisations: string[] = ['Org2MSP', 'Org3MSP'];
+    const organisations: string[] = ['Org2MSP', 'Org3MSP', 'Org1MSP'];
 
     organisations.forEach((organisation) => {
         it(`Assert access set for ${organisation}`, () => {
@@ -105,19 +94,8 @@ describe(`Test ${CertificateLogic.prototype.queryAcquirer.name} for own identity
             expect(AccessControl.isAuthorized(CertificateLogic.prototype.CheckCertificateFromAcquirerIsIssued.name,
                 mockedIdentity, organisation)).toBe(true);
             expect(mockedIdentity.getMSPID).toBeCalledTimes(1);
-            expect(mockedIdentity.getID).toBeCalledTimes(0);
+            expect(mockedIdentity.getID).toBeCalledTimes(1);
         });
-    });
-
-    it(`Assert access set for Farmer`, () => {
-        const farmerID = 'Org1MSP';
-        setupMock.getMSPID.mockReturnValueOnce(farmerID);
-        setupMock.getID.mockReturnValueOnce(`CN=${farmerID}::`);
-        const mockedIdentity = setupMock as unknown as ClientIdentity;
-        expect(AccessControl.isAuthorized(CertificateLogic.prototype.CheckCertificateFromAcquirerIsIssued.name,
-            mockedIdentity, farmerID)).toBe(true);
-        expect(mockedIdentity.getMSPID).toBeCalledTimes(1);
-        expect(mockedIdentity.getID).toBeCalledTimes(1);
     });
 });
 
@@ -134,7 +112,7 @@ describe(`Test ${CertificateLogic.prototype.CheckCertificateFromAcquirerIsIssued
             expect(AccessControl.isAuthorized(CertificateLogic.prototype.CheckCertificateFromAcquirerIsIssued.name,
                 mockedIdentity, OTHER_ORGANISATION)).toBe(true);
             expect(mockedIdentity.getMSPID).toBeCalledTimes(1);
-            expect(mockedIdentity.getID).toBeCalledTimes(0);
+            expect(mockedIdentity.getID).toBeCalledTimes(1);
         });
     });
 
@@ -147,5 +125,14 @@ describe(`Test ${CertificateLogic.prototype.CheckCertificateFromAcquirerIsIssued
             mockedIdentity, OTHER_ORGANISATION)).toBe(false);
         expect(mockedIdentity.getMSPID).toBeCalledTimes(1);
         expect(mockedIdentity.getID).toBeCalledTimes(1);
+    });
+});
+
+describe('Test extracting utility', () => {
+
+    it('Simple extracting test', () => {
+        const exampleProto = Object.getPrototypeOf(new AccessControl());
+        const result: string = exampleProto.constructor.getWalletId(`SHOULDBEIGNORED;CN=EXAMPLE_IDENTITY::CN=NEXT::`);
+        expect(result).toBe('EXAMPLE_IDENTITY');
     });
 });

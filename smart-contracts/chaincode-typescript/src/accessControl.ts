@@ -9,6 +9,8 @@ export class AccessControl {
     static certBodyOrg = 'Org2MSP';
     static producerOrg = 'Org3MSP';
 
+    static controllingBodies = new Set([AccessControl.certBodyOrg, AccessControl.producerOrg]);
+
     /**
      * Method which returns true iff the client invoking a function is authorized to do so
      * @param methodInvoked the method being invoked
@@ -32,22 +34,17 @@ export class AccessControl {
             // The certBody, all producers, and the acquirer of a certificate are authorized
             case CertificateLogic.prototype.CheckCertificateFromAcquirerIsIssued.name: {
                 const mspId = clientIdentity.getMSPID();
-                if (new Set([this.certBodyOrg, this.producerOrg]).has(mspId)) {
-                    return true;
-                }
                 const id = this.getWalletId(clientIdentity.getID());
-                return id === queryValue;
+                return new Set(this.controllingBodies).has(mspId) || id === queryValue;
             }
 
             // The certBody, and the acquirer of a certificate are authorized
             case CertificateLogic.prototype.queryAcquirer.name: {
                 const mspId = clientIdentity.getMSPID();
-                if (mspId === this.certBodyOrg) {
-                    return true;
-                }
                 const id = this.getWalletId(clientIdentity.getID());
-                return ((id === queryValue));
+                return mspId === this.certBodyOrg || id === queryValue;
             }
+
             // Functions without auth: ReadCertificate, and CertificateExists
             default: {
                 throw new Error('Authorization on this function not implemented');
@@ -61,7 +58,6 @@ export class AccessControl {
      * @param idString string representing the id of the invoker
      */
     private static getWalletId(idString: string) {
-        // TODO: Writer parser for this.
         const startIndex = idString.indexOf('CN=') + 3;
         const endIndex = idString.indexOf('::', startIndex);
         return idString.substring(startIndex, endIndex);
