@@ -5,7 +5,8 @@
             <mat-icon>menu</mat-icon>
         </button>
     </div>
-    <div class="title">{{title}} | {{currentpage}}</div>
+    <div class="title"
+         [class.collide]="this.collide">{{title}} | {{currentpage}}</div>
 </div>
 <!--<div class="side-bar"></div>-->
 <!--<app-navigation-bar #barComponent></app-navigation-bar>-->

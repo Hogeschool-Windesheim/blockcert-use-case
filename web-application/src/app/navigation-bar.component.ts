@@ -1,5 +1,6 @@
 import {Component} from '@angular/core';
 import {Router} from '@angular/router';
+import {NavigationService} from './navigation.service';
 
 export interface NavigationItem {
     text: string;
@@ -16,15 +17,11 @@ export class NavigationBarComponent {
     navigationItems: NavigationItem[] = [{text: 'Create new certificate', route: '/create-certificate'},
         {text: 'List of certificates', route: '/certificate-list'}];
 
-    constructor(private _router: Router) {
+    constructor(private _navigationService: NavigationService) {
     }
 
     toggle(): void {
-        this.show = !this.show;
+        this._navigationService.open = !this._navigationService.open;
+        this.show = this._navigationService.open;
     }
-
-    navigate(navigationItem: NavigationItem): void {
-        // this._router.navigate();
-    }
-
 }
