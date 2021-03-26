@@ -38,6 +38,10 @@ export class CertificateService {
         return this._getAll$;
     }
 
+    getLocalAll(): Certificate[] {
+        return _.values(this._certificates);
+    }
+
     private _checkIfValid(): void {
         _.forEach(this._certificates, (certificate) => certificate.setValid());
     }
