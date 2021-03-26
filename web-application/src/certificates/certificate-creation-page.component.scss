@@ -1,0 +1,19 @@
+certificate-creation-page {
+    //width: calc(100% - 40px);
+    //padding: 10px;
+    //float: left;
+    //display: block;
+    //margin: 10px;
+
+    certificate-creation {
+        margin: 10px;
+        transition: width 300ms ease;
+        width: calc(100% - 20px);
+        display: block;
+        float: left;
+    }
+
+    certificate-creation.open {
+        width: calc(100% - 206px);
+    }
+}
