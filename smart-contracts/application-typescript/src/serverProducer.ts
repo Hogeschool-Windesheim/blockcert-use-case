@@ -2,8 +2,8 @@ import * as bodyParser from 'body-parser';
 import * as cors from 'cors';
 import * as express from 'express';
 import {createServer} from 'http';
-import {Certificate} from '../../chaincode-typescript/dist/certificate';
 import {Network} from './network';
+
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
@@ -11,7 +11,7 @@ app.use(bodyParser.urlencoded({extended: false}));
 
 export class ServerProducer {
 
-    static port = 4103;
+    static port = 4100;
     constructor(private _network: Network) {
 
     }
@@ -22,8 +22,8 @@ export class ServerProducer {
     }
 
     private _getListener(): void {
-        app.get('/certificate/isValid/:id', async (req, res) => {
-            const result = await this._network.contract.evaluateTransaction('CheckCertificateFromAcquirerIsIssued', req.params.id);
+        app.get('/certificate', async (req, res) => {
+            const result = await this._network.contract.evaluateTransaction('GetAllCertificates');
             console.log(result);
             res.json({
                 success: true,
