@@ -91,7 +91,7 @@ describe(`Test ${CertificateLogic.prototype.queryAcquirer.name} for own identity
             setupMock.getID.mockReturnValueOnce(`CN=${organisation}::`);
             const mockedIdentity = setupMock as unknown as ClientIdentity;
             // Perform query to own channel
-            expect(AccessControl.isAuthorized(CertificateLogic.prototype.CheckCertificateFromAcquirerIsIssued.name,
+            expect(AccessControl.isAuthorized(CertificateLogic.prototype.queryAcquirer.name,
                 mockedIdentity, organisation)).toBe(true);
             expect(mockedIdentity.getMSPID).toBeCalledTimes(1);
             expect(mockedIdentity.getID).toBeCalledTimes(1);
