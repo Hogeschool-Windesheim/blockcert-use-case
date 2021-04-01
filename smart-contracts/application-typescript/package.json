@@ -12,6 +12,8 @@
         "lint": "tslint -c tslint.json 'src/**/*.ts'",
         "pretest": "npm run lint",
         "start": "npm run build && node dist/appCertificateBody.js --configFile resources/certificate-body/config.json --jsonPath configuration",
+        "startProducer": "npm run build && node dist/appProducer.js",
+        "startFarmer": "npm run build && node dist/appFarmer.js",
         "build": "tsc",
         "build:watch": "tsc -w",
         "prepublishOnly": "npm run build"

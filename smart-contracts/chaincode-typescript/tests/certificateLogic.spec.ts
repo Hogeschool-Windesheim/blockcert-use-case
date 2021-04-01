@@ -2,10 +2,20 @@ import {Context} from 'fabric-contract-api';
 import {createMock} from 'ts-auto-mock';
 import {ImportMock} from 'ts-mock-imports';
 import * as accessControlModule from '../src/accessControl';
+import * as utilityControlModule from '../src/utility';
+
 import {Certificate} from '../src/certificate';
 import {CertificateLogic} from '../src/certificateLogic';
 
 const accessControlMock = ImportMock.mockFunction(accessControlModule.AccessControl, 'isAuthorized');
+const stateValidityUtilityMock = ImportMock.mockFunction(utilityControlModule.Utility, 'checkStateValidity');
+
+const isAuthorizedSpy = jest.fn().mockReturnValue(true);
+const isValidStateSpy = jest.fn().mockReturnValue(true);
+
+const isUnauthorizedSpy = jest.fn().mockReturnValue(false);
+const isInvalidStateSpy = jest.fn().mockReturnValue(false);
+
 const contextMock: Context = createMock<Context>();
 const certLogic = new CertificateLogic();
 
@@ -31,8 +41,8 @@ describe('Test SmartContract Ledger Initialization', () => {
     const certificates: Certificate[] = [
         {
             ID: '1',
-            StartDate: 'startDate',
-            EndDate: 'endDate',
+            StartDate: '03-10-2021',
+            EndDate: '03-30-2021',
             CertNr: 'certNr',
             Acquirer: 'henk',
             Address: 'address',
@@ -41,13 +51,13 @@ describe('Test SmartContract Ledger Initialization', () => {
         },
         {
             ID: '2',
-            StartDate: 'startDate2',
-            EndDate: 'endDate2',
+            StartDate: '03-10-2021',
+            EndDate: '03-22-2021',
             CertNr: 'certNr2',
             Acquirer: 'acquirer2',
             Address: 'address2',
             RegistrationNr: 'registrationNr2',
-            State: 'REVOKED',
+            State: 'ISSUED',
         },
     ];
 
@@ -63,24 +73,25 @@ describe('Test SmartContract Ledger Initialization', () => {
 describe('Test creation of certificates', () => {
 
     it('Unauthorized test', async () => {
-        const isAuthorizedSpy = jest.fn((_) => false);
-        accessControlMock.callsFake(isAuthorizedSpy);
+        accessControlMock.callsFake(isUnauthorizedSpy);
         await expect(() => certLogic.CreateCertificate(contextMock, testingCertificate.ID, testingCertificate.StartDate,
             testingCertificate.EndDate, testingCertificate.CertNr, testingCertificate.Acquirer, testingCertificate.Address,
             testingCertificate.RegistrationNr, testingCertificate.State))
             .rejects.toThrowError(new Error('Action not allowed by this user'));
 
-        expect(isAuthorizedSpy).toBeCalledWith('CreateCertificate', contextMock.clientIdentity, null);
+        expect(isUnauthorizedSpy).toBeCalledWith('CreateCertificate', contextMock.clientIdentity, null);
         expect(contextMock.stub.putState).toBeCalledTimes(0);
     });
 
     it('Authorized test', async () => {
-        const isAuthorizedSpy = jest.fn((_) => true);
         accessControlMock.callsFake(isAuthorizedSpy);
+
+        stateValidityUtilityMock.callsFake(isValidStateSpy);
         expect(await certLogic.CreateCertificate(contextMock, testingCertificate.ID, testingCertificate.StartDate,
             testingCertificate.EndDate, testingCertificate.CertNr, testingCertificate.Acquirer, testingCertificate.Address,
             testingCertificate.RegistrationNr, testingCertificate.State));
         expect(isAuthorizedSpy).toBeCalledWith('CreateCertificate', contextMock.clientIdentity, null);
+        expect(isValidStateSpy).toBeCalledWith(testingCertificate.State);
         expect(contextMock.stub.putState).toBeCalledTimes(1);
     });
 
@@ -118,19 +129,18 @@ describe('Test Reading certificate', () => {
 
 describe('Test updating certificates', () => {
 
-    it('Check unauthorized access', () => {
-        const accessControlSpy = jest.fn().mockReturnValue(false);
-        accessControlMock.callsFake(accessControlSpy);
+    it('Check unauthorized access', async () => {
+        accessControlMock.callsFake(isUnauthorizedSpy);
 
-        expect(certLogic.UpdateCertificate(contextMock, testingCertificate.ID, testingCertificate.StartDate,
+        await expect(certLogic.UpdateCertificate(contextMock, testingCertificate.ID, testingCertificate.StartDate,
             testingCertificate.EndDate, testingCertificate.CertNr, testingCertificate.Acquirer, testingCertificate.Address,
             testingCertificate.RegistrationNr, testingCertificate.State))
             .rejects
             .toThrowError('Action not allowed by this user');
-        expect(accessControlSpy).toBeCalledWith('UpdateCertificate', contextMock.clientIdentity, null);
+        expect(isUnauthorizedSpy).toBeCalledWith('UpdateCertificate', contextMock.clientIdentity, null);
     });
 
-    it('Non existing certificate', () => {
+    it('Non existing certificate', async () => {
         // As to not pollute the used CertificateLogic object
         const certificateLogicLocal = new CertificateLogic();
         const existsSpy = jest.fn().mockReturnValue(false);
@@ -141,7 +151,7 @@ describe('Test updating certificates', () => {
         const accessControlSpy = jest.fn().mockReturnValue(true);
         accessControlMock.callsFake(accessControlSpy);
 
-        expect(certificateLogicLocal.UpdateCertificate(contextMock, testingCertificate.ID, testingCertificate.StartDate,
+        await expect(certificateLogicLocal.UpdateCertificate(contextMock, testingCertificate.ID, testingCertificate.StartDate,
             testingCertificate.EndDate, testingCertificate.CertNr, testingCertificate.Acquirer, testingCertificate.Address,
             testingCertificate.RegistrationNr, testingCertificate.State))
             .rejects
@@ -171,17 +181,16 @@ describe('Test updating certificates', () => {
 
 describe('Test Deleting certificates', () => {
 
-    it('Check unauthorized access', () => {
-        const accessControlSpy = jest.fn().mockReturnValue(false);
-        accessControlMock.callsFake(accessControlSpy);
+    it('Check unauthorized access', async () => {
+        accessControlMock.callsFake(isUnauthorizedSpy);
 
-        expect(certLogic.DeleteCertificate(contextMock, testingCertificate.ID))
+        await expect(certLogic.DeleteCertificate(contextMock, testingCertificate.ID))
             .rejects
             .toThrowError('Action not allowed by this user');
-        expect(accessControlSpy).toBeCalledWith('DeleteCertificate', contextMock.clientIdentity, null);
+        expect(isUnauthorizedSpy).toBeCalledWith('DeleteCertificate', contextMock.clientIdentity, null);
     });
 
-    it('Non existing certificate', () => {
+    it('Non existing certificate', async () => {
         // As to not pollute the used CertificateLogic object
         const certificateLogicLocal = new CertificateLogic();
         const existsSpy = jest.fn().mockReturnValue(false);
@@ -189,14 +198,13 @@ describe('Test Deleting certificates', () => {
             'CertificateExists')
             .callsFake(existsSpy);
 
-        const accessControlSpy = jest.fn().mockReturnValue(true);
-        accessControlMock.callsFake(accessControlSpy);
+        accessControlMock.callsFake(isAuthorizedSpy);
 
-        expect(certificateLogicLocal.DeleteCertificate(contextMock, testingCertificate.ID))
+        await expect(certificateLogicLocal.DeleteCertificate(contextMock, testingCertificate.ID))
             .rejects
             .toThrowError('The certificate 1 does not exist');
         expect(existsSpy).toBeCalledWith(contextMock, testingCertificate.ID);
-        expect(accessControlSpy).toBeCalledWith('DeleteCertificate', contextMock.clientIdentity, null);
+        expect(isAuthorizedSpy).toBeCalledWith('DeleteCertificate', contextMock.clientIdentity, null);
     });
 
     it('Existing certificate', async () => {
@@ -207,8 +215,7 @@ describe('Test Deleting certificates', () => {
             'CertificateExists')
             .callsFake(existsSpy);
 
-        const accessControlSpy = jest.fn().mockReturnValue(true);
-        accessControlMock.callsFake(accessControlSpy);
+        accessControlMock.callsFake(isAuthorizedSpy);
         await certificateLogicLocal.DeleteCertificate(contextMock, testingCertificate.ID);
 
         expect(contextMock.stub.deleteState).toBeCalledWith(testingCertificate.ID);
@@ -228,30 +235,31 @@ describe('Test Update certificate state', () => {
         State: 'REVOKED',
     };
 
-    it('Check unauthorized access', () => {
-        const accessControlSpy = jest.fn().mockReturnValue(false);
-        accessControlMock.callsFake(accessControlSpy);
+    it('Check unauthorized access', async () => {
+        accessControlMock.callsFake(isUnauthorizedSpy);
 
-        expect(certLogic.UpdateState(contextMock, testingCertificate.ID, testingCertificate.State))
+        await expect(certLogic.UpdateState(contextMock, testingCertificate.ID, testingCertificate.State))
             .rejects
             .toThrowError('Action not allowed by this user');
-        expect(accessControlSpy).toBeCalledWith('UpdateState', contextMock.clientIdentity, null);
+        expect(isUnauthorizedSpy).toBeCalledWith('UpdateState', contextMock.clientIdentity, null);
     });
 
-    it('Non existing certificate', () => {
+    it('Non existing certificate', async () => {
+        const updatedState = 'REVOKED';
         // As to not pollute the used CertificateLogic object
-        jest.spyOn(contextMock.stub, 'getState').mockReturnValue(Promise.reject());
-        const accessControlSpy = jest.fn().mockReturnValue(true);
-        accessControlMock.callsFake(accessControlSpy);
-
-        expect(certLogic.UpdateState(contextMock, testingCertificate.ID, 'REVOKED'))
+        jest.spyOn(contextMock.stub, 'getState').mockReturnValue(Promise.resolve(new Uint8Array()));
+        accessControlMock.callsFake(isAuthorizedSpy);
+        stateValidityUtilityMock.callsFake(isValidStateSpy);
+        await expect(certLogic.UpdateState(contextMock, testingCertificate.ID, updatedState))
             .rejects
             .toThrowError('The certificate 1 does not exist');
+        expect(isValidStateSpy).toBeCalledWith(updatedState);
         expect(contextMock.stub.getState).toBeCalledWith(testingCertificate.ID);
-        expect(accessControlSpy).toBeCalledWith('UpdateState', contextMock.clientIdentity, null);
+        expect(isAuthorizedSpy).toBeCalledWith('UpdateState', contextMock.clientIdentity, null);
     });
 
     it('Existing certificate', async () => {
+        const updatedState = 'REVOKED';
         // As to not pollute the used CertificateLogic object
         const certificateLogicLocal = new CertificateLogic();
         const readCertificateSpy = jest.fn().mockReturnValue(JSON.stringify(testingCertificate));
@@ -259,11 +267,11 @@ describe('Test Update certificate state', () => {
             'ReadCertificate')
             .callsFake(readCertificateSpy);
 
-        const accessControlSpy = jest.fn().mockReturnValue(true);
-        accessControlMock.callsFake(accessControlSpy);
-        await certificateLogicLocal.UpdateState(contextMock, testingCertificate.ID, 'REVOKED');
-
+        stateValidityUtilityMock.callsFake(isValidStateSpy);
+        accessControlMock.callsFake(isAuthorizedSpy);
+        await certificateLogicLocal.UpdateState(contextMock, testingCertificate.ID, updatedState);
+        expect(isValidStateSpy).toBeCalledWith(updatedState);
         expect(contextMock.stub.putState).toBeCalledWith(updatedCertificate.ID, Buffer.from(JSON.stringify(updatedCertificate)));
-        expect(accessControlSpy).toBeCalledWith('UpdateState', contextMock.clientIdentity, null);
+        expect(isAuthorizedSpy).toBeCalledWith('UpdateState', contextMock.clientIdentity, null);
     });
 });

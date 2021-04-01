@@ -1,4 +1,19 @@
 <div class="wrapper">
+    <div class="search-box">
+        <mat-form-field appearance="fill">
+            <mat-label>Property to filter on</mat-label>
+            <mat-select [(ngModel)]="currentFilterProperty" name="state">
+                <mat-option *ngFor="let field of searchFields" [value]="field">
+                    {{field}}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+            <mat-label>Value to filter on</mat-label>
+            <input [(ngModel)]="currentFilterValue" (ngModelChange)="onValueChange()" matInput
+                   name="registration-number">
+        </mat-form-field>
+    </div>
     <mat-accordion multi>
         <div *ngFor="let certificate of certificates">
             <mat-expansion-panel [class.valid]="certificate.Valid">

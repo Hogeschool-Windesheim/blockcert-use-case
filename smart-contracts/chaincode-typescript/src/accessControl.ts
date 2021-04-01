@@ -24,18 +24,22 @@ export class AccessControl {
             case CertificateLogic.prototype.DeleteCertificate.name:
             case CertificateLogic.prototype.UpdateCertificate.name:
             case CertificateLogic.prototype.UpdateState.name:
-            case CertificateLogic.prototype.GetAllCertificates.name:
             case CertificateLogic.prototype.queryState.name:
             case CertificateLogic.prototype.queryRegistrationNr.name:
             case CertificateLogic.prototype.CreateCertificate.name: {
                 return clientIdentity.getMSPID() === this.certBodyOrg;
             }
 
+            case CertificateLogic.prototype.GetAllCertificates.name: {
+                const mspId = clientIdentity.getMSPID();
+                return mspId === this.certBodyOrg || mspId === this.producerOrg;
+            }
+
             // The certBody, all producers, and the acquirer of a certificate are authorized
             case CertificateLogic.prototype.CheckCertificateFromAcquirerIsIssued.name: {
                 const mspId = clientIdentity.getMSPID();
                 const id = this.getWalletId(clientIdentity.getID());
-                return new Set(this.controllingBodies).has(mspId) || id === queryValue;
+                return mspId === this.certBodyOrg || mspId === this.producerOrg || id === queryValue;
             }
 
             // The certBody, and the acquirer of a certificate are authorized

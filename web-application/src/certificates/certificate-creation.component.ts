@@ -3,6 +3,7 @@ import {Certificate} from '../data/models/certificate';
 import {CertificateService} from '../data/services/certificate-service';
 import * as _ from 'lodash';
 import * as moment from 'moment';
+import {NavigationService} from '../app/navigation.service';
 
 @Component({
     selector: 'certificate-creation',
@@ -23,7 +24,7 @@ export class CertificateCreationComponent {
     states = [{type: 'ISSUED'}, {type: 'REVOKED'}];
     isValid = false;
 
-    constructor(private _certificateService: CertificateService) {
+    constructor(private _certificateService: CertificateService, public navigationService: NavigationService) {
     }
 
     onValueChange(): void {
