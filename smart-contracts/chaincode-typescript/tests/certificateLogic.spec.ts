@@ -1,11 +1,8 @@
 import {Context} from 'fabric-contract-api';
 import {createMock} from 'ts-auto-mock';
-
-import * as parameterize from 'js-parametrize';
 import {ImportMock} from 'ts-mock-imports';
 import * as accessControlModule from '../src/accessControl';
 import {Certificate} from '../src/certificate';
-import * as certificateLogicModule from '../src/certificateLogic';
 import {CertificateLogic} from '../src/certificateLogic';
 
 const accessControlMock = ImportMock.mockFunction(accessControlModule.AccessControl, 'isAuthorized');
@@ -62,7 +59,6 @@ describe('Test SmartContract Ledger Initialization', () => {
 
     });
 });
-
 
 describe('Test creation of certificates', () => {
 
@@ -138,7 +134,7 @@ describe('Test updating certificates', () => {
         // As to not pollute the used CertificateLogic object
         const certificateLogicLocal = new CertificateLogic();
         const existsSpy = jest.fn().mockReturnValue(false);
-        const certificateExistsMock = ImportMock.mockFunction(certificateLogicLocal,
+        ImportMock.mockFunction(certificateLogicLocal,
             'CertificateExists')
             .callsFake(existsSpy);
 
@@ -158,7 +154,7 @@ describe('Test updating certificates', () => {
         // As to not pollute the used CertificateLogic object
         const certificateLogicLocal = new CertificateLogic();
         const existsSpy = jest.fn().mockReturnValue(true);
-        const certificateExistsMock = ImportMock.mockFunction(certificateLogicLocal,
+        ImportMock.mockFunction(certificateLogicLocal,
             'CertificateExists')
             .callsFake(existsSpy);
 
@@ -189,7 +185,7 @@ describe('Test Deleting certificates', () => {
         // As to not pollute the used CertificateLogic object
         const certificateLogicLocal = new CertificateLogic();
         const existsSpy = jest.fn().mockReturnValue(false);
-        const certificateExistsMock = ImportMock.mockFunction(certificateLogicLocal,
+        ImportMock.mockFunction(certificateLogicLocal,
             'CertificateExists')
             .callsFake(existsSpy);
 
@@ -207,7 +203,7 @@ describe('Test Deleting certificates', () => {
         // As to not pollute the used CertificateLogic object
         const certificateLogicLocal = new CertificateLogic();
         const existsSpy = jest.fn().mockReturnValue(true);
-        const certificateExistsMock = ImportMock.mockFunction(certificateLogicLocal,
+        ImportMock.mockFunction(certificateLogicLocal,
             'CertificateExists')
             .callsFake(existsSpy);
 
@@ -259,7 +255,7 @@ describe('Test Update certificate state', () => {
         // As to not pollute the used CertificateLogic object
         const certificateLogicLocal = new CertificateLogic();
         const readCertificateSpy = jest.fn().mockReturnValue(JSON.stringify(testingCertificate));
-        const certificateExistsMock = ImportMock.mockFunction(certificateLogicLocal,
+        ImportMock.mockFunction(certificateLogicLocal,
             'ReadCertificate')
             .callsFake(readCertificateSpy);
 
