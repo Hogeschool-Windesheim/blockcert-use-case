@@ -9,7 +9,7 @@
 
 5: After dependencies are installed run ```npm start``` to start an application with a server listening on port 4100
 
-6: Running npm startFarmer or startProducer will run these application for farmer and producer respectively.
+6: Running ```npm startFarmer``` or ```npm startProducer``` will run these application for farmer and producer respectively.
 
 7: Go in terminal to web-application, run ```npm install``` and ```npm start```
 
