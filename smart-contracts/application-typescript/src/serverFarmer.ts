@@ -11,7 +11,7 @@ app.use(bodyParser.urlencoded({extended: false}));
 
 export class ServerFarmer {
 
-    static port = 4100;
+    static port = 4101;
 
     constructor(private _network: Network) {
 

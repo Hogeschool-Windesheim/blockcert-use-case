@@ -5,6 +5,7 @@ import * as _ from 'lodash';
 import {ServerResponse} from '../server-response';
 import * as moment from 'moment';
 import {ReplaySubject} from 'rxjs';
+import {environment} from '../../environments/environment';
 
 @Injectable({
     providedIn: 'root'
@@ -12,7 +13,7 @@ import {ReplaySubject} from 'rxjs';
 export class CertificateService {
     private _getAll$ = new ReplaySubject<Certificate[]>();
     private _certificates: { [id: number]: Certificate } = {};
-    private _configUrl = 'http://localhost:4100/certificate';
+    private _configUrl: string;
     private _httpOptions = {
         headers: new HttpHeaders({
             'Content-Type': 'application/json'
@@ -20,15 +21,20 @@ export class CertificateService {
     };
 
     constructor(private http: HttpClient) {
+        this._configUrl = environment.requestUrl;
     }
 
     async save(certificate: Certificate): Promise<any> {
+        const requestUrl = environment.requestUrl;
+        console.log(requestUrl);
         const object = _.assign({}, certificate);
         _.assign(object, {StartDate: certificate.StartDate.toISOString(), EndDate: certificate.EndDate.toISOString()});
         await this.http.put(this._configUrl, JSON.stringify(object), this._httpOptions).toPromise();
     }
 
     getAll(): ReplaySubject<Certificate[]> {
+        const requestUrl = environment.requestUrl;
+        console.log(requestUrl);
         this._certificates = {};
         this.http.get<ServerResponse<Certificate>>(this._configUrl).subscribe((data) => {
             _.forEach(data.message, (certificate) => this._deserialize(certificate.Record));
@@ -59,7 +65,6 @@ export class CertificateService {
     async delete(certificate: Certificate): Promise<void> {
         const httpParams = new HttpParams().set('certificate', `${certificate.ID}`);
         const result = await this.http.delete(this._configUrl, {params: httpParams}).toPromise();
-        console.log(result);
         this.getAll();
     }
 }
