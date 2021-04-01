@@ -80,7 +80,7 @@ export class QueryUtils {
      * Function getQueryResultForQueryString
      * @param {Context} ctx the transaction context
      * @param {any} self within scope passed in
-     * @param {String} the query string created prior to calling this fn
+     * @param {String} queryString the query string created prior to calling this fn
      */
     async getQueryResultForQueryString(ctx, self, queryString): Promise<string[]> {
         const resultsIterator = await ctx.stub.getQueryResult(queryString);
@@ -88,9 +88,11 @@ export class QueryUtils {
     }
 
     /**
-     * Function getAllResults
-     * @param {resultsIterator} iterator within scope passed in
-     * @param {Boolean} isHistory query string created prior to calling this fn
+     * Function getAllResults to obtain all the certificates that are related to a query. This function
+     * acts as a helper for the query functions of the QueryUtility.
+     * @param {StateQueryIterator} iterator within scope passed onto this function to extract all results.
+     * Note that no size checks are in place, so out-of-memory may occur for a very large result set.
+     * @param {Boolean} isHistory query string created prior to invoking getAllResults.
      */
     async getAllResults(iterator: Iterators.StateQueryIterator, isHistory): Promise<string[]> {
         const allResults = [];

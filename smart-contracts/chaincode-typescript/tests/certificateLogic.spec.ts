@@ -1,14 +1,20 @@
 import {Context} from 'fabric-contract-api';
 import {createMock} from 'ts-auto-mock';
 import {ImportMock} from 'ts-mock-imports';
-import * as accessControlModule from '../src/accessControl';
-import * as utilityControlModule from '../src/utility';
 
+// Import modules to be mocked using ImportMock, as these objects are instantiated/used within the to be tested code.
+import * as accessControlModule from '../src/accessControl';
+import * as queryUtilityModule from '../src/queries';
+import * as utilityControlModule from '../src/utility';
+import * as parametrize from 'js-parametrize';
+import {Utility} from '../dist/utility';
 import {Certificate} from '../src/certificate';
 import {CertificateLogic} from '../src/certificateLogic';
+import {On, method} from "ts-auto-mock/extension";
 
 const accessControlMock = ImportMock.mockFunction(accessControlModule.AccessControl, 'isAuthorized');
 const stateValidityUtilityMock = ImportMock.mockFunction(utilityControlModule.Utility, 'checkStateValidity');
+const mockedQueryUtilityModule = ImportMock.mockClass(queryUtilityModule, 'QueryUtils');
 
 const isAuthorizedSpy = jest.fn().mockReturnValue(true);
 const isValidStateSpy = jest.fn().mockReturnValue(true);
@@ -37,7 +43,6 @@ afterEach(() => {
 });
 
 describe('Test SmartContract Ledger Initialization', () => {
-    // TODO: Extract this from field of Certificate Logic
     const certificates: Certificate[] = [
         {
             ID: '1',
@@ -273,5 +278,136 @@ describe('Test Update certificate state', () => {
         expect(isValidStateSpy).toBeCalledWith(updatedState);
         expect(contextMock.stub.putState).toBeCalledWith(updatedCertificate.ID, Buffer.from(JSON.stringify(updatedCertificate)));
         expect(isAuthorizedSpy).toBeCalledWith('UpdateState', contextMock.clientIdentity, null);
+    });
+});
+
+describe('Test UpdateStateAllCertificates', () => {
+
+    it('Authorized test', async () => {
+        const stringToDateMock = ImportMock.mockFunction(Utility, 'stringToDate');
+        const stringToDateSpy = jest.fn().mockReturnValue(new Date());
+        stringToDateMock.callsFake(stringToDateSpy);
+
+        const certificateLogicLocal = new CertificateLogic();
+        const queryStateMock = ImportMock.mockFunction(certificateLogicLocal, 'queryState');
+        queryStateMock.callsFake((_) => [{Record: testingCertificate}]);
+        const UpdateStateMock = ImportMock.mockFunction(certificateLogicLocal, 'UpdateState');
+        const updateStateSpy = jest.fn();
+        UpdateStateMock.callsFake(updateStateSpy);
+
+        await certificateLogicLocal.updateStateAllCertificates(contextMock);
+        expect(updateStateSpy).toBeCalledWith(contextMock, testingCertificate.ID, 'EXPIRED');
+
+    });
+});
+
+describe('Test Registration number queries', () => {
+    it('Authorized query', async () => {
+        accessControlMock.callsFake(isAuthorizedSpy);
+        const querySpy = jest.fn();
+        mockedQueryUtilityModule.mock('queryByRegistrationNr').callsFake(querySpy);
+
+        accessControlMock.callsFake(isAuthorizedSpy);
+        await certLogic.queryRegistrationNr(contextMock, '1');
+
+        expect(isAuthorizedSpy).toBeCalledWith('queryRegistrationNr', contextMock.clientIdentity, null);
+        expect(querySpy).toBeCalledWith('1');
+    });
+
+    it('Unauthorized query', async () => {
+        accessControlMock.callsFake(isUnauthorizedSpy);
+        await expect(certLogic.queryRegistrationNr(contextMock, '1'))
+            .rejects
+            .toThrow('Action not allowed by this user');
+        expect(isUnauthorizedSpy).toBeCalledWith('queryRegistrationNr', contextMock.clientIdentity, null);
+    });
+});
+
+
+describe('Test queryState', () => {
+    it('Authorized query', async () => {
+        accessControlMock.callsFake(isAuthorizedSpy);
+        const querySpy = jest.fn();
+        mockedQueryUtilityModule.mock('queryKeyByState').callsFake(querySpy);
+
+        accessControlMock.callsFake(isAuthorizedSpy);
+        await certLogic.queryState(contextMock, 'SOME_STATE');
+        expect(isAuthorizedSpy).toBeCalledWith('queryState', contextMock.clientIdentity, null);
+        expect(querySpy).toBeCalledWith('SOME_STATE');
+    });
+
+    it('Unauthorized query', async () => {
+        accessControlMock.callsFake(isUnauthorizedSpy);
+        await expect(certLogic.queryState(contextMock, 'SOME_STATE'))
+            .rejects
+            .toThrow('Action not allowed by this user');
+        expect(isUnauthorizedSpy).toBeCalledWith('queryState', contextMock.clientIdentity, null);
+    });
+});
+
+describe('Test queryAcquirer', () => {
+    it('Authorized query', async () => {
+        accessControlMock.callsFake(isAuthorizedSpy);
+        const querySpy = jest.fn();
+        mockedQueryUtilityModule.mock('queryKeyByAcquirer').callsFake(querySpy);
+
+        accessControlMock.callsFake(isAuthorizedSpy);
+        await certLogic.queryAcquirer(contextMock, 'SomeFarmer');
+        expect(isAuthorizedSpy).toBeCalledWith('queryAcquirer', contextMock.clientIdentity, 'SomeFarmer');
+        expect(querySpy).toBeCalledWith('SomeFarmer');
+    });
+
+    it('Unauthorized query', async () => {
+        accessControlMock.callsFake(isUnauthorizedSpy);
+        await expect(certLogic.queryAcquirer(contextMock, 'SomeFarmer'))
+            .rejects
+            .toThrow('Action not allowed by this user');
+        expect(isUnauthorizedSpy).toBeCalledWith('queryAcquirer', contextMock.clientIdentity, 'SomeFarmer');
+    });
+});
+
+
+describe('Test CheckCertificateFromAcquirerIsIssued', () => {
+    parametrize([
+        [Promise.resolve([testingCertificate]), true],
+        [Promise.resolve([]), false],
+    ], (answer, assert) => {
+        it(`Test for a issued == ${assert}`, async () => {
+            accessControlMock.callsFake(isAuthorizedSpy);
+            const querySpy = jest.fn().mockReturnValue(answer);
+            mockedQueryUtilityModule.mock('queryByAcquirerAndState').callsFake(querySpy);
+
+            accessControlMock.callsFake(isAuthorizedSpy);
+            expect(await certLogic.CheckCertificateFromAcquirerIsIssued(contextMock, 'SomeFarmer')).toBe(assert);
+            expect(isAuthorizedSpy).toBeCalledWith('CheckCertificateFromAcquirerIsIssued', contextMock.clientIdentity, 'SomeFarmer');
+            expect(querySpy).toBeCalledWith('SomeFarmer', 'ISSUED');
+        });
+    });
+
+    it('Unauthorized query', async () => {
+        accessControlMock.callsFake(isUnauthorizedSpy);
+        await expect(certLogic.CheckCertificateFromAcquirerIsIssued(contextMock, 'SomeFarmer'))
+            .rejects
+            .toThrow('Action not allowed by this user');
+        expect(isUnauthorizedSpy).toBeCalledWith('CheckCertificateFromAcquirerIsIssued', contextMock.clientIdentity, 'SomeFarmer');
+    });
+});
+
+describe('Test CertificateExists', () => {
+    parametrize([
+        [Promise.resolve([testingCertificate]), true],
+        [Promise.resolve([]), false],
+    ], (answer, assert) => {
+        it(`Test for a an existing == ${assert} certificate`, async () => {
+            accessControlMock.callsFake(isAuthorizedSpy);
+            const querySpy = jest.fn().mockReturnValue(answer);
+            mockedQueryUtilityModule.mock('queryByAcquirerAndState').callsFake(querySpy);
+            jest.spyOn(contextMock.stub, 'getState').mockReturnValue(answer);
+            accessControlMock.callsFake(isAuthorizedSpy);
+            expect(await certLogic.CertificateExists(contextMock, '1234')).toBe(assert);
+            // We expect this function to not perform access control.
+            expect(isAuthorizedSpy).toBeCalledTimes(0);
+            expect(contextMock.stub.getState).toBeCalledWith('1234');
+        });
     });
 });

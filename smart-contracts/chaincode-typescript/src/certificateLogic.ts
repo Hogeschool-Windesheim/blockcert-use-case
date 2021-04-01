@@ -92,7 +92,10 @@ export class CertificateLogic extends Contract {
         return certificateJSON.toString();
     }
 
-    /** UpdateCertificate updates an existing certificate in the world state with provided parameters.
+    /**
+     * UpdateCertificate updates a pre-existing certificate in the world state with provided parameters.
+     * Requires the request to be performed by an Authorized party, using a valid update state. Otherwise,
+     * Errors are thrown to indicate incorrect invocation.
      * @param {Context} ctx  the transaction context
      * @param {string} id the id of the certificate to be updated
      * @param {string} startDate the new start date of the certificate
@@ -149,20 +152,23 @@ export class CertificateLogic extends Contract {
     }
 
     /**
-     * CertificateExists returns true iff certificate with given ID exists in world state.
-     * @param {Context} ctx the transaction context
-     * @param {string} id the id of the certificate for which we are checking if it exists
+     * CertificateExists returns true iff certificate with given ID exists in world state. Note that
+     * this function does not perform access control, and thus requires the caller to invoke this function
+     * after verifying the authorization of a request.
+     * @param {Context} ctx the transaction context.
+     * @param {string} id the id of the certificate for which we are checking if it exists.
      */
     @Transaction(false)
     @Returns('boolean')
     public async CertificateExists(ctx: Context, id: string): Promise<boolean> {
         const certificateJSON = await ctx.stub.getState(id);
-
         return certificateJSON && certificateJSON.length > 0;
     }
 
     /**
      * UpdateState updates the state field of certificate with given id in the world state.
+     * Note that ReadCertificate also checks for existence of certificate, as such no access control
+     * checks are performed by this function itself.
      * @param {Context} ctx the transaction context
      * @param {string} id the id of the certificate to be updated
      * @param {string} state the new state of the certificate
@@ -172,7 +178,6 @@ export class CertificateLogic extends Contract {
         const isAuthorized = AccessControl.isAuthorized(this.UpdateState.name, ctx.clientIdentity, null);
         if (isAuthorized) {
             Utility.checkStateValidity(state);
-            // Note that ReadCertificate also checks for existence.
             const certificateString = await this.ReadCertificate(ctx, id);
             const certificate = JSON.parse(certificateString);
             certificate.State = state;
@@ -183,7 +188,9 @@ export class CertificateLogic extends Contract {
     }
 
     /**
-     * GetAllCertificates returns all certificates found in the world state.
+     * GetAllCertificates returns all certificates found in the world state. Note that this function is untested
+     * as testing this becomes a complex mocking exercise. As such, a different testing approach is needed
+     * for this piece of code.
      * @param {Context} ctx the transaction context
      */
     @Transaction(false)
@@ -286,7 +293,7 @@ export class CertificateLogic extends Contract {
     /**
      * Function which updates all expired certificates in the ledger
      * NOTE: this function rules certificates on the same date still as valid,
-     * it only expires certificates with endDate < currentDate
+     * it only expires certificates with endDate < currentDate.
      * @param ctx the transaction context
      * @param date the current date
      */
