@@ -6,6 +6,8 @@ import {ServerResponse} from '../server-response';
 import * as moment from 'moment';
 import {ReplaySubject} from 'rxjs';
 import {environment} from '../../environments/environment';
+import {MatDialog} from '@angular/material/dialog';
+import {BlockingDialogComponent} from '../../dialog/dialog.component';
 
 @Injectable({
     providedIn: 'root'
@@ -20,21 +22,23 @@ export class CertificateService {
         })
     };
 
-    constructor(private http: HttpClient) {
+    constructor(private http: HttpClient, public dialog: MatDialog) {
         this._configUrl = environment.requestUrl;
     }
 
     async save(certificate: Certificate): Promise<any> {
-        const requestUrl = environment.requestUrl;
-        console.log(requestUrl);
         const object = _.assign({}, certificate);
         _.assign(object, {StartDate: certificate.StartDate.toISOString(), EndDate: certificate.EndDate.toISOString()});
-        await this.http.put(this._configUrl, JSON.stringify(object), this._httpOptions).toPromise();
+        const dialogRef = this.dialog.open(BlockingDialogComponent);
+        dialogRef.componentInstance.options.title = 'Creating certificate...';
+        this.http.put(this._configUrl, JSON.stringify(object), this._httpOptions).subscribe((res) => {
+            dialogRef.componentInstance.options.title = 'Successfully created certificate!';
+        }, () => {
+            dialogRef.componentInstance.options.title = 'Unauthorized for creating certificates';
+        });
     }
 
     getAll(): ReplaySubject<Certificate[]> {
-        const requestUrl = environment.requestUrl;
-        console.log(requestUrl);
         this._certificates = {};
         this.http.get<ServerResponse<Certificate>>(this._configUrl).subscribe((data) => {
             _.forEach(data.message, (certificate) => this._deserialize(certificate.Record));
@@ -64,7 +68,13 @@ export class CertificateService {
 
     async delete(certificate: Certificate): Promise<void> {
         const httpParams = new HttpParams().set('certificate', `${certificate.ID}`);
-        const result = await this.http.delete(this._configUrl, {params: httpParams}).toPromise();
-        this.getAll();
+        const dialogRef = this.dialog.open(BlockingDialogComponent);
+        dialogRef.componentInstance.options.title = 'Deleting certificate...';
+        this.http.delete(this._configUrl, {params: httpParams}).subscribe(() => {
+            dialogRef.componentInstance.options.title = 'Successfully deleted certificate!';
+            this.getAll();
+        }, () => {
+            dialogRef.componentInstance.options.title = 'Unauthorized for deleting certificates';
+        });
     }
 }

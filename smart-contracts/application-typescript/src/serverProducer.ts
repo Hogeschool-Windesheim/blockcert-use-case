@@ -19,6 +19,8 @@ export class ServerProducer {
     start(): void {
         createServer(app).listen(ServerProducer.port, () => console.log(`Server started on ${ServerProducer.port}`));
         this._getListener();
+        this._putListener();
+        this._deleteListener();
     }
 
     private _getListener(): void {
@@ -29,6 +31,18 @@ export class ServerProducer {
                 success: true,
                 message: JSON.parse(result.toString()),
             });
+        });
+    }
+
+    private _putListener(): void {
+        app.put('/certificate', async (req, res) => {
+            res.sendStatus(403);
+        });
+    }
+
+    private _deleteListener(): void {
+        app.delete('/certificate', async (req, res) => {
+            res.sendStatus(403);
         });
     }
 }

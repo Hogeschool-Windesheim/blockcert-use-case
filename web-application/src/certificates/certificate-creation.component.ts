@@ -21,7 +21,7 @@ export class CertificateCreationComponent {
     delete = false;
 
     jsonThing = JSON.stringify;
-    states = [{type: 'ISSUED'}, {type: 'REVOKED'}, {}];
+    states = [{type: 'ISSUED'}, {type: 'REVOKED'}, {type: 'EXPIRED'}];
     isValid = false;
 
     constructor(private _certificateService: CertificateService, public navigationService: NavigationService) {

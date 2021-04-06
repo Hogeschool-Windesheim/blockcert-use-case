@@ -20,6 +20,8 @@ export class ServerFarmer {
     start(): void {
         createServer(app).listen(ServerFarmer.port, () => console.log(`Server started on ${ServerFarmer.port}`));
         this._getListener();
+        this._putListener();
+        this._deleteListener();
     }
 
     private _getListener(): void {
@@ -31,6 +33,18 @@ export class ServerFarmer {
                 success: true,
                 message: JSON.parse(result.toString()),
             });
+        });
+    }
+
+    private _putListener(): void {
+        app.put('/certificate', async (req, res) => {
+            res.sendStatus(403);
+        });
+    }
+
+    private _deleteListener(): void {
+        app.delete('/certificate', async (req, res) => {
+            res.sendStatus(403);
         });
     }
 }

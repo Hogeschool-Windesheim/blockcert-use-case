@@ -12,7 +12,7 @@ import {MatSelectChange} from '@angular/material/select';
 })
 export class CertificateListComponent implements OnInit {
     certificates: Certificate[] = [];
-    searchFields = [];
+    searchFields = ['ID', 'CertNr', 'Address', 'AcquirerID', 'AcquirerName', 'RegistrationNr', 'CertificateURL', 'State'];
     currentFilterProperty: string = null;
     currentFilterValue: string = null;
 
@@ -20,8 +20,6 @@ export class CertificateListComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        const certificate = new Certificate();
-        _.forEach(certificate, (value, prop) => this.searchFields.push(prop));
         this._certificateService.getAll().subscribe((certificates) => (this.certificates = certificates));
     }
 
