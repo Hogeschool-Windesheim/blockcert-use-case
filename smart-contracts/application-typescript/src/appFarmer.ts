@@ -1,27 +1,19 @@
 import * as path from 'path';
-import {Network, NetworkConfig} from './network';
+import {Network} from './network';
 import {ServerFarmer} from './serverFarmer';
+import {getArguments, NetworkConfig} from './utils/NetworkConfig';
 
 /**
  * This app is meant to be run by the Certificate Body, it will have the ability to initialize the ledger,
  * and alter it afterwards. Furthermore, it is allowed to lookup certificates from this own registrationNr.
  */
 async function main() {
-    const networkConfig: NetworkConfig = {
-        chaincodeName: 'basic',
-        channelName: 'mychannel',
-        caName: 'ca.org1.example.com',
-        department: 'org1.department1',
-        filePath: path.resolve(__dirname, '..', '..', '..', 'test-network',
-            'organizations', 'peerOrganizations', 'org1.example.com', 'connection-org1.json'),
-        mspOrg: 'Org1MSP',
-        userId: 'appUser',
-        walletPath: path.join(__dirname, 'wallet/walletFarmer'),
-    };
+    const networkConfiguration: NetworkConfig = getArguments();
+    networkConfiguration.walletPath = path.join(__dirname, networkConfiguration.walletPath);
     const network = new Network();
-    await network.initialize(networkConfig);
+    await network.initialize(networkConfiguration);
     const server = new ServerFarmer(network);
-    server.start();
+    server.start(networkConfiguration.portNumber);
 }
 
 main();

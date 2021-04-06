@@ -8,10 +8,10 @@ import {getArguments, NetworkConfig} from './utils/NetworkConfig';
  */
 async function main() {
     const networkConfiguration: NetworkConfig = getArguments();
-    networkConfiguration.walletPath = path.join(networkConfiguration.walletPath, 'wallet/walletCert');
+    networkConfiguration.walletPath = path.join(__dirname, networkConfiguration.walletPath);
     const network = new Network();
     await network.initialize(networkConfiguration);
     const server = new Server(network);
-    server.start();
+    server.start(networkConfiguration.portNumber);
 }
 main();
