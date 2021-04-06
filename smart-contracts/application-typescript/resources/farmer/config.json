@@ -1,6 +1,6 @@
 {
   "version": "0.0.1",
-  "interface": "certificate-body",
+  "interface": "farmer",
   "configuration": {
     "chaincodeName": "basic",
     "channelName": "mychannel",
@@ -9,7 +9,7 @@
     "filePath": "../../../../test-network/organizations/peerOrganizations/org2.example.com/connection-org2.json",
     "mspOrg": "Org2MSP",
     "userId": "appUser",
-    "walletPath": "wallet/walletCert",
-    "portNumber": "4100"
+    "walletPath": "wallet/walletFarmer",
+    "portNumber": "4101"
   }
 }
