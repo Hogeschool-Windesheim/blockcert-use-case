@@ -3,24 +3,23 @@ import {createMock} from 'ts-auto-mock';
 import {ImportMock} from 'ts-mock-imports';
 
 // Import modules to be mocked using ImportMock, as these objects are instantiated/used within the to be tested code.
+import * as parametrize from 'js-parametrize';
 import * as accessControlModule from '../src/accessControl';
 import * as queryUtilityModule from '../src/queries';
 import * as utilityControlModule from '../src/utility';
-import * as parametrize from 'js-parametrize';
+
 import {Utility} from '../dist/utility';
 import {Certificate} from '../src/certificate';
 import {CertificateLogic} from '../src/certificateLogic';
-import {On, method} from "ts-auto-mock/extension";
 
 const accessControlMock = ImportMock.mockFunction(accessControlModule.AccessControl, 'isAuthorized');
 const stateValidityUtilityMock = ImportMock.mockFunction(utilityControlModule.Utility, 'checkStateValidity');
 const mockedQueryUtilityModule = ImportMock.mockClass(queryUtilityModule, 'QueryUtils');
 
-const isAuthorizedSpy = jest.fn().mockReturnValue(true);
-const isValidStateSpy = jest.fn().mockReturnValue(true);
+const isAuthorizedSpy = jest.fn((_) => true);
+const isValidStateSpy = jest.fn((_) => true);
 
-const isUnauthorizedSpy = jest.fn().mockReturnValue(false);
-const isInvalidStateSpy = jest.fn().mockReturnValue(false);
+const isUnauthorizedSpy = jest.fn((_) => false);
 
 const contextMock: Context = createMock<Context>();
 const certLogic = new CertificateLogic();
@@ -71,7 +70,6 @@ describe('Test SmartContract Ledger Initialization', () => {
         expect(contextMock.stub.putState).toBeCalledTimes(2);
         expect(contextMock.stub.putState).toHaveBeenNthCalledWith(1, '1', Buffer.from(JSON.stringify(certificates[0])));
         expect(contextMock.stub.putState).toHaveBeenNthCalledWith(2, '2', Buffer.from(JSON.stringify(certificates[1])));
-
     });
 });
 
@@ -323,7 +321,6 @@ describe('Test Registration number queries', () => {
     });
 });
 
-
 describe('Test queryState', () => {
     it('Authorized query', async () => {
         accessControlMock.callsFake(isAuthorizedSpy);
@@ -365,7 +362,6 @@ describe('Test queryAcquirer', () => {
         expect(isUnauthorizedSpy).toBeCalledWith('queryAcquirer', contextMock.clientIdentity, 'SomeFarmer');
     });
 });
-
 
 describe('Test CheckCertificateFromAcquirerIsIssued', () => {
     parametrize([
