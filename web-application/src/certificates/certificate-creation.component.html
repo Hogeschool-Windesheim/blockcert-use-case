@@ -28,20 +28,32 @@
     </mat-form-field>
 
     <mat-form-field appearance="fill">
-        <mat-label>Name of the farmer</mat-label>
-        <input (change)="onValueChange()" required matInput [(ngModel)]="model.Acquirer" placeholder="E.g. 47718"
+        <mat-label>Id of the acquirer</mat-label>
+        <input (change)="onValueChange()" required matInput [(ngModel)]="model.AcquirerID" placeholder="E.g. 5"
                name="acquirer">
     </mat-form-field>
 
     <mat-form-field appearance="fill">
-        <mat-label>Address of the farmer</mat-label>
-        <input (change)="onValueChange()" required matInput [(ngModel)]="model.Address" placeholder="E.g. 47718"
+        <mat-label>Name of the acquirer</mat-label>
+        <input (change)="onValueChange()" required matInput [(ngModel)]="model.AcquirerName" placeholder="E.g. Jason"
+               name="acquirer">
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+        <mat-label>Address of the acquirer</mat-label>
+        <input (change)="onValueChange()" required matInput [(ngModel)]="model.Address"
                name="address">
     </mat-form-field>
 
     <mat-form-field appearance="fill">
         <mat-label>Registration number</mat-label>
-        <input (change)="onValueChange()" required matInput [(ngModel)]="model.RegistrationNr" placeholder="E.g. 47718"
+        <input (change)="onValueChange()" required matInput [(ngModel)]="model.RegistrationNr"
+               name="registration-number">
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+        <mat-label>URL to the official certificate</mat-label>
+        <input (change)="onValueChange()" required matInput [(ngModel)]="model.CertificateURL"
                name="registration-number">
     </mat-form-field>
 

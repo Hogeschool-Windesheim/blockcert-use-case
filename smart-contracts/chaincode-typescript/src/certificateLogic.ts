@@ -2,7 +2,7 @@ import {Context, Contract, Info, Returns, Transaction} from 'fabric-contract-api
 import {AccessControll} from './accessControll';
 import {Certificate} from './certificate';
 import {QueryUtils} from './queries';
-import { Utility } from './utility';
+import {Utility} from './utility';
 
 /**
  * This file describes all operations allowed on the blockchain, such as creating, updating, deleting, and quering certificates.
@@ -22,9 +22,11 @@ export class CertificateLogic extends Contract {
                 StartDate: '03-10-2021',
                 EndDate: '03-30-2021',
                 CertNr: 'certNr',
-                Acquirer: 'henk',
+                AcquirerID: '4736',
+                AcquirerName: 'henk',
                 Address: 'address',
                 RegistrationNr: 'registrationNr',
+                CertificateURL: 'www.test.nl',
                 State: 'ISSUED',
             },
             {
@@ -32,9 +34,11 @@ export class CertificateLogic extends Contract {
                 StartDate: '03-10-2021',
                 EndDate: '03-22-2021',
                 CertNr: 'certNr2',
-                Acquirer: 'acquirer2',
+                AcquirerID: '1231',
+                AcquirerName: 'Teun',
                 Address: 'address2',
                 RegistrationNr: 'registrationNr2',
+                CertificateURL: 'www.template.nl',
                 State: 'ISSUED',
             },
         ];
@@ -52,24 +56,29 @@ export class CertificateLogic extends Contract {
      * @param {string} startDate the start date of the certificate
      * @param {string} endDate the end date of the certificate
      * @param {string} certNr the certification number
-     * @param {string} acquirer the current owner of the certificate
+     * @param {string} acquirerID id of the owner of the certificate
+     * @param {string} acquirerName name of the owner of the certificate
      * @param {string} address the address of the owner
      * @param {string} registrationNr the id of the certificate body who issued the certificate
+     * @param {string} certificateURL link to the official certificate
      * @param {string} state the current state of the certificate
      */
     @Transaction()
-    public async CreateCertificate(ctx: Context, id: string, startDate: string, endDate: string, certNr: string, acquirer: string, address: string, registrationNr: string, state: string): Promise<void> {
+    public async CreateCertificate(ctx: Context, id: string, startDate: string, endDate: string, certNr: string, acquirerID: string,
+                                   acquirerName: string, address: string, registrationNr: string, certificateURL: string, state: string): Promise<void> {
         const isAuthorized = AccessControll.isAuthorized(this.CreateCertificate.name, ctx.clientIdentity, null);
         if (isAuthorized) {
             Utility.checkStateValidity(state);
-            const certificate = {
+            const certificate: Certificate = {
                 ID: id,
                 StartDate: startDate,
                 EndDate: endDate,
                 CertNr: certNr,
-                Acquirer: acquirer,
+                AcquirerID: acquirerID,
+                AcquirerName: acquirerName,
                 Address: address,
                 RegistrationNr: registrationNr,
+                CertificateURL: certificateURL,
                 State: state,
             };
             await ctx.stub.putState(id, Buffer.from(JSON.stringify(certificate)));
@@ -98,13 +107,16 @@ export class CertificateLogic extends Contract {
      * @param {string} startDate the new start date of the certificate
      * @param {string} endDate the new end date of the certificate
      * @param {string} certNr the new certification number
-     * @param {string} acquirer the new current owner of the certificate
+     * @param {string} acquirerID id of the new owner of the certificate
+     * @param {string} acquirerName name of the new owner of the certificate
      * @param {string} address the new address of the owner
      * @param {string} registrationNr the new id of the certificate body who issued the certificate
+     * @param {string} certificateURL link to the official certificate
      * @param {string} state the new state of the certificate
      */
     @Transaction()
-    public async UpdateCertificate(ctx: Context, id: string, startDate: string, endDate: string, certNr: string, acquirer: string, address: string, registrationNr: string, state: string): Promise<void> {
+    public async UpdateCertificate(ctx: Context, id: string, startDate: string, endDate: string, certNr: string, acquirerID: string,
+                                   acquirerName: string, address: string, registrationNr: string, certificateURL: string, state: string): Promise<void> {
         const isAuthorized = AccessControll.isAuthorized(this.UpdateCertificate.name, ctx.clientIdentity, null);
         if (isAuthorized) {
             Utility.checkStateValidity(state);
@@ -113,14 +125,16 @@ export class CertificateLogic extends Contract {
                 throw new Error(`The certificate ${id} does not exist`);
             }
             // overwriting original certificate with new certificate
-            const updatedCertificate = {
+            const updatedCertificate: Certificate = {
                 ID: id,
                 StartDate: startDate,
                 EndDate: endDate,
                 CertNr: certNr,
-                Acquirer: acquirer,
+                AcquirerID: acquirerID,
+                AcquirerName: acquirerName,
                 Address: address,
                 RegistrationNr: registrationNr,
+                CertificateURL: certificateURL,
                 State: state,
             };
             return ctx.stub.putState(id, Buffer.from(JSON.stringify(updatedCertificate)));
@@ -233,7 +247,7 @@ export class CertificateLogic extends Contract {
     /**
      * queryAcquirer returns all certificates belonging to the acquirer
      * @param {Context} ctx the transaction context
-     * @param {String} acquirer the acquirer who we want to query for
+     * @param {String} acquirer the acquirer id who we want to query for
      */
     @Transaction(false)
     @Returns('string')

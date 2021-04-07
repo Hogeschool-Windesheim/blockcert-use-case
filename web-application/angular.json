@@ -65,6 +65,30 @@
                                     "maximumError": "4kb"
                                 }
                             ]
+                        },
+                        "farmer": {
+                            "fileReplacements": [
+                                {
+                                    "replace": "src/environments/environment.ts",
+                                    "with": "src/environments/environment.farmer.ts"
+                                }
+                            ]
+                        },
+                        "producer": {
+                            "fileReplacements": [
+                                {
+                                    "replace": "src/environments/environment.ts",
+                                    "with": "src/environments/environment.producer.ts"
+                                }
+                            ],
+                        },
+                        "certificate-body": {
+                            "fileReplacements": [
+                                {
+                                    "replace": "src/environments/environment.ts",
+                                    "with": "src/environments/environment.certificate-body.ts"
+                                }
+                            ]
                         }
                     }
                 },
@@ -76,6 +100,15 @@
                     "configurations": {
                         "production": {
                             "browserTarget": "Blockcert-Demo:build:production"
+                        },
+                        "farmer": {
+                            "browserTarget": "Blockcert-Demo:build:farmer"
+                        },
+                        "producer": {
+                            "browserTarget": "Blockcert-Demo:build:producer"
+                        },
+                        "certificate-body": {
+                            "browserTarget": "Blockcert-Demo:build:certificate-body"
                         }
                     }
                 },

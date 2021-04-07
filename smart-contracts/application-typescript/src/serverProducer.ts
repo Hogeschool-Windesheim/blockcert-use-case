@@ -11,14 +11,21 @@ app.use(bodyParser.urlencoded({extended: false}));
 
 export class ServerProducer {
 
-    static port = 4100;
     constructor(private _network: Network) {
 
     }
 
-    start(): void {
-        createServer(app).listen(ServerProducer.port, () => console.log(`Server started on ${ServerProducer.port}`));
+    /**
+     * Start the server on the pre-specified port.
+     * @param port integer representation on which port an identity must start.
+     */
+    start(port: string): void {
+        const portNumber = parseInt(port, 10);
+        createServer(app)
+            .listen(portNumber, () => console.log(`Server started on ${portNumber}`));
         this._getListener();
+        this._putListener();
+        this._deleteListener();
     }
 
     private _getListener(): void {
@@ -29,6 +36,18 @@ export class ServerProducer {
                 success: true,
                 message: JSON.parse(result.toString()),
             });
+        });
+    }
+
+    private _putListener(): void {
+        app.put('/certificate', async (req, res) => {
+            res.sendStatus(403);
+        });
+    }
+
+    private _deleteListener(): void {
+        app.delete('/certificate', async (req, res) => {
+            res.sendStatus(403);
         });
     }
 }
