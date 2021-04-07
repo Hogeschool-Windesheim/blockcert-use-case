@@ -22,9 +22,11 @@ export class CertificateLogic extends Contract {
                 StartDate: '03-10-2021',
                 EndDate: '03-30-2021',
                 CertNr: 'certNr',
-                Acquirer: 'henk',
+                AcquirerID: '4736',
+                AcquirerName: 'henk',
                 Address: 'address',
                 RegistrationNr: 'registrationNr',
+                CertificateURL:'www.test.nl',
                 State: 'ISSUED',
             },
             {
@@ -32,9 +34,11 @@ export class CertificateLogic extends Contract {
                 StartDate: '03-10-2021',
                 EndDate: '03-22-2021',
                 CertNr: 'certNr2',
-                Acquirer: 'acquirer2',
+                AcquirerID: '1231',
+                AcquirerName: 'Teun',
                 Address: 'address2',
                 RegistrationNr: 'registrationNr2',
+                CertificateURL: 'www.template.nl',
                 State: 'ISSUED',
             },
         ];
@@ -233,7 +237,7 @@ export class CertificateLogic extends Contract {
     /**
      * queryAcquirer returns all certificates belonging to the acquirer
      * @param {Context} ctx the transaction context
-     * @param {String} acquirer the acquirer who we want to query for
+     * @param {String} acquirer the acquirer id who we want to query for
      */
     @Transaction(false)
     @Returns('string')
