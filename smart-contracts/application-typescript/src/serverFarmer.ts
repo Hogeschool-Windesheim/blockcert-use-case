@@ -17,8 +17,14 @@ export class ServerFarmer {
 
     }
 
-    start(): void {
-        createServer(app).listen(ServerFarmer.port, () => console.log(`Server started on ${ServerFarmer.port}`));
+    /**
+     * Start the server on the pre-specified port.
+     * @param port integer representation on which port an identity must start.
+     */
+    start(port: string): void {
+        const portNumber = parseInt(port, 10);
+        createServer(app)
+            .listen(portNumber, () => console.log(`Server started on ${portNumber}`));
         this._getListener();
         this._putListener();
         this._deleteListener();
