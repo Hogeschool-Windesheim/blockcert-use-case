@@ -20,6 +20,7 @@ import {MatSelectModule} from '@angular/material/select';
 import {CertificateComponent} from '../certificates/certificate.component';
 import {CertificateCreationPageComponent} from '../certificates/certificate-creation-page.component';
 import {NavigationService} from './navigation.service';
+import {BlockingDialogComponent} from '../dialog/dialog.component';
 
 
 @NgModule({
@@ -29,7 +30,8 @@ import {NavigationService} from './navigation.service';
         NavigationBarComponent,
         CertificateCreationComponent,
         CertificateComponent,
-        CertificateCreationPageComponent
+        CertificateCreationPageComponent,
+        BlockingDialogComponent
     ],
     imports: [
         AppRoutingModule,
