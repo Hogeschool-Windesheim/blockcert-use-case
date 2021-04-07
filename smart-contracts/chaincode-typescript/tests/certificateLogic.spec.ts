@@ -24,16 +24,18 @@ const isUnauthorizedSpy = jest.fn((_) => false);
 const contextMock: Context = createMock<Context>();
 const certLogic = new CertificateLogic();
 
-const testingCertificate = {
+const testingCertificate: Certificate = {
     ID: '1',
     StartDate: '1/1/2020',
     EndDate: '1/1/2021',
     CertNr: '1',
-    Acquirer: 'Test',
+    AcquirerID: '42',
+    AcquirerName: 'Test',
     Address: 'TestStreet',
     RegistrationNr: '1',
+    CertificateURL: 'https://org1.example.com/some_document.pdf',
     State: 'VALID',
-} as Certificate;
+};
 
 afterEach(() => {
     // By clearing all the mocks we can be sure that the mocks are properly instantiated
@@ -42,44 +44,23 @@ afterEach(() => {
 });
 
 describe('Test SmartContract Ledger Initialization', () => {
-    const certificates: Certificate[] = [
-        {
-            ID: '1',
-            StartDate: '03-10-2021',
-            EndDate: '03-30-2021',
-            CertNr: 'certNr',
-            Acquirer: 'henk',
-            Address: 'address',
-            RegistrationNr: 'registrationNr',
-            State: 'ISSUED',
-        },
-        {
-            ID: '2',
-            StartDate: '03-10-2021',
-            EndDate: '03-22-2021',
-            CertNr: 'certNr2',
-            Acquirer: 'acquirer2',
-            Address: 'address2',
-            RegistrationNr: 'registrationNr2',
-            State: 'ISSUED',
-        },
-    ];
 
     it('Test chaincode initialization', async () => {
         await certLogic.InitLedger(contextMock);
         expect(contextMock.stub.putState).toBeCalledTimes(2);
-        expect(contextMock.stub.putState).toHaveBeenNthCalledWith(1, '1', Buffer.from(JSON.stringify(certificates[0])));
-        expect(contextMock.stub.putState).toHaveBeenNthCalledWith(2, '2', Buffer.from(JSON.stringify(certificates[1])));
+        expect(contextMock.stub.putState).toHaveBeenNthCalledWith(1, '1', Buffer.from(JSON.stringify(certLogic.certificates[0])));
+        expect(contextMock.stub.putState).toHaveBeenNthCalledWith(2, '2', Buffer.from(JSON.stringify(certLogic.certificates[1])));
     });
 });
 
 describe('Test creation of certificates', () => {
+    const callCreate = (certificate: Certificate) => certLogic.CreateCertificate(contextMock, certificate.ID,
+        certificate.StartDate, certificate.EndDate, certificate.CertNr, certificate.AcquirerID, certificate.AcquirerName,
+        certificate.Address, certificate.RegistrationNr, certificate.CertificateURL, certificate.State);
 
     it('Unauthorized test', async () => {
         accessControlMock.callsFake(isUnauthorizedSpy);
-        await expect(() => certLogic.CreateCertificate(contextMock, testingCertificate.ID, testingCertificate.StartDate,
-            testingCertificate.EndDate, testingCertificate.CertNr, testingCertificate.Acquirer, testingCertificate.Address,
-            testingCertificate.RegistrationNr, testingCertificate.State))
+        await expect(callCreate(testingCertificate))
             .rejects.toThrowError(new Error('Action not allowed by this user'));
 
         expect(isUnauthorizedSpy).toBeCalledWith('CreateCertificate', contextMock.clientIdentity, null);
@@ -90,19 +71,18 @@ describe('Test creation of certificates', () => {
         accessControlMock.callsFake(isAuthorizedSpy);
 
         stateValidityUtilityMock.callsFake(isValidStateSpy);
-        expect(await certLogic.CreateCertificate(contextMock, testingCertificate.ID, testingCertificate.StartDate,
-            testingCertificate.EndDate, testingCertificate.CertNr, testingCertificate.Acquirer, testingCertificate.Address,
-            testingCertificate.RegistrationNr, testingCertificate.State));
+        expect(await callCreate(testingCertificate));
         expect(isAuthorizedSpy).toBeCalledWith('CreateCertificate', contextMock.clientIdentity, null);
         expect(isValidStateSpy).toBeCalledWith(testingCertificate.State);
         expect(contextMock.stub.putState).toBeCalledTimes(1);
     });
 
-    it('Assert authorization is used', () => {
-        certLogic.CreateCertificate(contextMock, testingCertificate.ID, testingCertificate.StartDate,
-            testingCertificate.EndDate, testingCertificate.CertNr, testingCertificate.Acquirer, testingCertificate.Address,
-            testingCertificate.RegistrationNr, testingCertificate.State);
-
+    it('Assert authorization is used', async () => {
+        stateValidityUtilityMock.callsFake(isValidStateSpy);
+        accessControlMock.callsFake(isAuthorizedSpy);
+        await callCreate(testingCertificate);
+        expect(isValidStateSpy).toBeCalledTimes(1);
+        expect(isAuthorizedSpy).toBeCalledTimes(1);
         expect(contextMock.stub.putState).toHaveBeenCalledWith(testingCertificate.ID, Buffer.from(JSON.stringify(testingCertificate)));
     });
 });
@@ -113,7 +93,9 @@ describe('Test Reading certificate', () => {
         const returnValue = new Uint8Array(Buffer.from(JSON.stringify(testingCertificate)));
         // @ts-ignore
         jest.spyOn(contextMock.stub, 'getState').mockReturnValue(returnValue);
-        expect(await certLogic.ReadCertificate(contextMock, testingCertificate.ID)).toBe(returnValue.toString());
+        await expect(certLogic.ReadCertificate(contextMock, testingCertificate.ID))
+            .resolves
+            .toBe(returnValue.toString());
         expect(contextMock.stub.getState).toBeCalledWith(testingCertificate.ID);
         expect(contextMock.stub.getState).toBeCalledTimes(1);
     });
@@ -123,7 +105,8 @@ describe('Test Reading certificate', () => {
 
         jest.spyOn(contextMock.stub, 'getState').mockReturnValue(returnValue);
 
-        await expect(certLogic.ReadCertificate(contextMock, testingCertificate.ID)).rejects
+        await expect(certLogic.ReadCertificate(contextMock, testingCertificate.ID))
+            .rejects
             .toThrow('The certificate 1 does not exist');
         expect(contextMock.stub.getState).toBeCalledWith(testingCertificate.ID);
         expect(contextMock.stub.getState).toBeCalledTimes(1);
@@ -132,12 +115,21 @@ describe('Test Reading certificate', () => {
 
 describe('Test updating certificates', () => {
 
+    /**
+     * 'Curry' update function to reduce code base to minimal lines of codes.
+     * @param certificate Certificate to test with.
+     * @param certificateLogic Underlying certificate logic to test with.
+     */
+    const createCallUpdate = (certificate: Certificate, certificateLogic: CertificateLogic = certLogic) => {
+        return () =>
+            certificateLogic.UpdateCertificate(contextMock, certificate.ID,
+                certificate.StartDate, certificate.EndDate, certificate.CertNr, certificate.AcquirerID, certificate.AcquirerName,
+                certificate.Address, certificate.RegistrationNr, certificate.CertificateURL, certificate.State);
+    };
+
     it('Check unauthorized access', async () => {
         accessControlMock.callsFake(isUnauthorizedSpy);
-
-        await expect(certLogic.UpdateCertificate(contextMock, testingCertificate.ID, testingCertificate.StartDate,
-            testingCertificate.EndDate, testingCertificate.CertNr, testingCertificate.Acquirer, testingCertificate.Address,
-            testingCertificate.RegistrationNr, testingCertificate.State))
+        await expect(createCallUpdate(testingCertificate))
             .rejects
             .toThrowError('Action not allowed by this user');
         expect(isUnauthorizedSpy).toBeCalledWith('UpdateCertificate', contextMock.clientIdentity, null);
@@ -154,9 +146,7 @@ describe('Test updating certificates', () => {
         const accessControlSpy = jest.fn().mockReturnValue(true);
         accessControlMock.callsFake(accessControlSpy);
 
-        await expect(certificateLogicLocal.UpdateCertificate(contextMock, testingCertificate.ID, testingCertificate.StartDate,
-            testingCertificate.EndDate, testingCertificate.CertNr, testingCertificate.Acquirer, testingCertificate.Address,
-            testingCertificate.RegistrationNr, testingCertificate.State))
+        await expect(createCallUpdate(testingCertificate, certificateLogicLocal))
             .rejects
             .toThrowError('The certificate 1 does not exist');
         expect(existsSpy).toBeCalledWith(contextMock, testingCertificate.ID);
@@ -173,9 +163,7 @@ describe('Test updating certificates', () => {
 
         const accessControlSpy = jest.fn().mockReturnValue(true);
         accessControlMock.callsFake(accessControlSpy);
-        await certificateLogicLocal.UpdateCertificate(contextMock, testingCertificate.ID, testingCertificate.StartDate,
-            testingCertificate.EndDate, testingCertificate.CertNr, testingCertificate.Acquirer, testingCertificate.Address,
-            testingCertificate.RegistrationNr, testingCertificate.State);
+        await createCallUpdate(testingCertificate, certificateLogicLocal)();
 
         expect(contextMock.stub.putState).toBeCalledWith(testingCertificate.ID, Buffer.from(JSON.stringify(testingCertificate)));
 
@@ -232,9 +220,11 @@ describe('Test Update certificate state', () => {
         StartDate: '1/1/2020',
         EndDate: '1/1/2021',
         CertNr: '1',
-        Acquirer: 'Test',
+        AcquirerID: '42',
+        AcquirerName: 'Test',
         Address: 'TestStreet',
         RegistrationNr: '1',
+        CertificateURL: 'https://org1.example.com/some_document.pdf',
         State: 'REVOKED',
     };
 
@@ -295,7 +285,6 @@ describe('Test UpdateStateAllCertificates', () => {
 
         await certificateLogicLocal.updateStateAllCertificates(contextMock);
         expect(updateStateSpy).toBeCalledWith(contextMock, testingCertificate.ID, 'EXPIRED');
-
     });
 });
 
@@ -374,7 +363,8 @@ describe('Test CheckCertificateFromAcquirerIsIssued', () => {
             mockedQueryUtilityModule.mock('queryByAcquirerAndState').callsFake(querySpy);
 
             accessControlMock.callsFake(isAuthorizedSpy);
-            expect(await certLogic.CheckCertificateFromAcquirerIsIssued(contextMock, 'SomeFarmer')).toBe(assert);
+            const result = await certLogic.CheckCertificateFromAcquirerIsIssued(contextMock, 'SomeFarmer');
+            expect(result).toBe(assert);
             expect(isAuthorizedSpy).toBeCalledWith('CheckCertificateFromAcquirerIsIssued', contextMock.clientIdentity, 'SomeFarmer');
             expect(querySpy).toBeCalledWith('SomeFarmer', 'ISSUED');
         });

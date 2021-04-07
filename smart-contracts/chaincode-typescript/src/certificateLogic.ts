@@ -9,41 +9,39 @@ import {Utility} from './utility';
  */
 @Info({title: 'CertificateLogic', description: 'Smart contract for trading certificates'})
 export class CertificateLogic extends Contract {
-
+    certificates: Certificate[] = [
+        {
+            ID: '1',
+            StartDate: '03-10-2021',
+            EndDate: '03-30-2021',
+            CertNr: 'certNr',
+            AcquirerID: '4736',
+            AcquirerName: 'henk',
+            Address: 'address',
+            RegistrationNr: 'registrationNr',
+            CertificateURL: 'www.test.nl',
+            State: 'ISSUED',
+        },
+        {
+            ID: '2',
+            StartDate: '03-10-2021',
+            EndDate: '03-22-2021',
+            CertNr: 'certNr2',
+            AcquirerID: '1231',
+            AcquirerName: 'Teun',
+            Address: 'address2',
+            RegistrationNr: 'registrationNr2',
+            CertificateURL: 'www.template.nl',
+            State: 'ISSUED',
+        },
+    ];
     /**
      * This function initialized the ledger with some initial data.
      * When moving to production, this will likely have to be altered.
      */
     @Transaction()
     public async InitLedger(ctx: Context): Promise<void> {
-        const certificates: Certificate[] = [
-            {
-                ID: '1',
-                StartDate: '03-10-2021',
-                EndDate: '03-30-2021',
-                CertNr: 'certNr',
-                AcquirerID: '4736',
-                AcquirerName: 'henk',
-                Address: 'address',
-                RegistrationNr: 'registrationNr',
-                CertificateURL: 'www.test.nl',
-                State: 'ISSUED',
-            },
-            {
-                ID: '2',
-                StartDate: '03-10-2021',
-                EndDate: '03-22-2021',
-                CertNr: 'certNr2',
-                AcquirerID: '1231',
-                AcquirerName: 'Teun',
-                Address: 'address2',
-                RegistrationNr: 'registrationNr2',
-                CertificateURL: 'www.template.nl',
-                State: 'ISSUED',
-            },
-        ];
-
-        for (const certificate of certificates) {
+        for (const certificate of this.certificates) {
             await ctx.stub.putState(certificate.ID, Buffer.from(JSON.stringify(certificate)));
             console.info(`Certificate ${certificate.ID} initialized`);
         }
