@@ -34,7 +34,7 @@ export class Certificate {
     // This is to be used in the future to link to the PDF version of the certificate.
     @Property()
     public CertificateURL: string;
-    
+
     @Property()
     public State: string;
 }

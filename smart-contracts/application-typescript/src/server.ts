@@ -49,14 +49,14 @@ export class Server {
 
             if (certificateStatus) {
                 await contract.submitTransaction('UpdateCertificate', proposal.ID, proposal.StartDate,
-                    proposal.EndDate, proposal.CertNr, proposal.Acquirer, proposal.Address, proposal.RegistrationNr,
-                    proposal.State);
+                    proposal.EndDate, proposal.CertNr, proposal.AcquirerID, proposal.AcquirerName, proposal.Address, proposal.RegistrationNr,
+                    proposal.CertificateURL, proposal.State);
                 const newCertificateCreated = await contract.evaluateTransaction('CertificateExists', proposal.ID);
                 res.json({certificate: proposal, status: newCertificateCreated.toString()});
             } else {
                 await contract.submitTransaction('CreateCertificate', proposal.ID, proposal.StartDate,
-                    proposal.EndDate, proposal.CertNr, proposal.Acquirer, proposal.Address, proposal.RegistrationNr,
-                    proposal.State);
+                    proposal.EndDate, proposal.CertNr, proposal.AcquirerID, proposal.AcquirerName, proposal.Address, proposal.RegistrationNr,
+                    proposal.CertificateURL, proposal.State);
                 // Report existence back to backend
                 const newCertificateCreated = await contract.evaluateTransaction('CertificateExists', proposal.ID);
                 res.json({certificate: proposal, status: newCertificateCreated.toString()});
