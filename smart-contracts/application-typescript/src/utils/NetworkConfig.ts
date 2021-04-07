@@ -11,6 +11,7 @@ export interface NetworkConfig {
     walletPath: string;
     configFile?: string;
     jsonPath?: string;
+    portNumber?: string;
 }
 
 export function getArguments() {
@@ -25,6 +26,7 @@ export function getArguments() {
             walletPath: {type: String, optional: true},
             configFile: {type: String, optional: true},
             jsonPath: {type: String, optional: true},
+            portNumber: {type: String, optional: true},
         }, {
             loadFromFileArg: 'configFile',
             loadFromFileJsonPathArg: 'jsonPath',

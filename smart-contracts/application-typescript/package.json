@@ -13,10 +13,10 @@
         "pretest": "npm run lint",
         "start": "npm run build && node dist/appCertificateBody.js --configFile resources/certificate-body/config.json --jsonPath configuration",
         "startProducer": "npm run build && node dist/appProducer.js --configFile resources/producer/config.json --jsonPath configuration",
-        "startFarmer": "npm run build && node dist/appProducer.js --configFile resources/farmer/config.json --jsonPath configuration",
+        "startFarmer": "npm run build && node dist/appFarmer.js --configFile resources/farmer/config.json --jsonPath configuration",
         "build": "tsc",
         "build:watch": "tsc -w",
-        "prepublishbaOnly": "npm run build"
+        "prepublishOnly": "npm run build"
     },
     "engineStrict": true,
     "author": "Hyperledger",
