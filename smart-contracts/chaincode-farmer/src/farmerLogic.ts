@@ -103,7 +103,9 @@ export class FarmerLogic extends Contract {
                     console.log(err);
                     record = strValue;
                 }
-                allResults.push({Key: result.value.key, Record: record});
+                if (record.id) {
+                    allResults.push({Key: result.value.key, Record: record});
+                }
                 result = await iterator.next();
             }
             return JSON.stringify(allResults);

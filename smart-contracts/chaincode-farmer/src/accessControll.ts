@@ -1,5 +1,5 @@
 import {ClientIdentity} from 'fabric-shim';
-import {CertificateLogic} from './certificateLogic';
+import {FarmerLogic} from './farmerLogic';
 
 /**
  * This class is used to regulate access controll on different functions performed on the blockchain.
@@ -19,35 +19,15 @@ export class AccessControll {
     static isAuthorized(methodInvoked: string, clientIdentity: ClientIdentity, queryValue: string): boolean {
         switch (methodInvoked) {
             // Match all funcitons which only the certification body is allowed to perform
-            case CertificateLogic.prototype.DeleteCertificate.name:
-            case CertificateLogic.prototype.UpdateCertificate.name:
-            case CertificateLogic.prototype.UpdateState.name:
-            case CertificateLogic.prototype.queryState.name:
-            case CertificateLogic.prototype.queryRegistrationNr.name:
-            case CertificateLogic.prototype.CreateCertificate.name: {
+            case FarmerLogic.prototype.createFarmer.name:
+            case FarmerLogic.prototype.deleteFarmer.name:
+            case FarmerLogic.prototype.updateFarmer.name: {
                 return clientIdentity.getMSPID() === this.certBodyOrg;
             }
 
-            case CertificateLogic.prototype.GetAllCertificates.name: {
+            case FarmerLogic.prototype.getAllFarmers.name: {
                 const mspId = clientIdentity.getMSPID();
                 return mspId === this.certBodyOrg || mspId === this.producerOrg;
-            }
-
-            // The certBody, all producers, and the acquirer of a certificate are authorized
-            case CertificateLogic.prototype.CheckCertificateFromAcquirerIsIssued.name: {
-                const mspId = clientIdentity.getMSPID();
-                const id = this.getWalletId(clientIdentity.getID());
-                return mspId === this.certBodyOrg || mspId === this.producerOrg || id === queryValue;
-            }
-
-            // The certBody, and the acquirer of a certificate are authorized
-            case CertificateLogic.prototype.queryAcquirer.name: {
-                const mspId = clientIdentity.getMSPID();
-                if (mspId === this.certBodyOrg) {
-                    return true;
-                }
-                const id = this.getWalletId(clientIdentity.getID());
-                return ((id === queryValue));
             }
             // Functions without auth: ReadCertificate, and CertificateExists
             default: {

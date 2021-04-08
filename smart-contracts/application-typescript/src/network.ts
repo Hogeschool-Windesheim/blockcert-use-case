@@ -30,6 +30,6 @@ export class Network {
         const network = await gateway.getNetwork(config.channelName);
         this.userId = config.userId;
         this.certificateContract = network.getContract(config.chaincodeName, 'CertificateLogic');
-        this.farmerContract = network.getContract(config.chaincodeName, 'FarmerLogic');
+        this.farmerContract = network.getContract('farmer', 'FarmerLogic');
     }
 }
