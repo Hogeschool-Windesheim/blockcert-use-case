@@ -29,7 +29,7 @@
 
     <mat-form-field appearance="fill">
         <mat-label>Acquirer of this certificate</mat-label>
-        <mat-select (selectionChange)="onValueChange()" [(ngModel)]="model.AcquirerID" name="state">
+        <mat-select (selectionChange)="onValueChange()" [(ngModel)]="model.AcquirerID" name="acquirer-id">
             <mat-option *ngFor="let farmer of farmers" [value]="farmer.id">
                 {{farmer.firstName + ' ' + farmer.lastName + ' ' + farmer.id}}
             </mat-option>
