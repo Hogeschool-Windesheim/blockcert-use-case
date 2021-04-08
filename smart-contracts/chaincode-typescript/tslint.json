@@ -14,7 +14,7 @@
         "triple-equals": true,
         "no-string-throw": true,
         "no-var-keyword": true,
-        "no-trailing-whitespace": true,
+        "no-trailing-whitespace": [true, "ignore-blank-lines"],
         "object-literal-key-quotes": [true, "as-needed"],
         "object-literal-sort-keys": false,
         "max-line-length": false,

@@ -1,5 +1,6 @@
 import {ClientIdentity} from 'fabric-shim';
 import {CertificateLogic} from './certificateLogic';
+import {FarmerLogic} from './farmerLogic';
 
 /**
  * This class is used to regulate access controll on different functions performed on the blockchain.
@@ -24,13 +25,17 @@ export class AccessControll {
             case CertificateLogic.prototype.UpdateState.name:
             case CertificateLogic.prototype.queryState.name:
             case CertificateLogic.prototype.queryRegistrationNr.name:
-            case CertificateLogic.prototype.CreateCertificate.name: {
+            case CertificateLogic.prototype.CreateCertificate.name:
+            case FarmerLogic.prototype.createFarmer.name:
+            case FarmerLogic.prototype.deleteFarmer.name:
+            case FarmerLogic.prototype.updateFarmer.name: {
                 return clientIdentity.getMSPID() === this.certBodyOrg;
             }
 
-            case CertificateLogic.prototype.GetAllCertificates.name: {
+            case CertificateLogic.prototype.GetAllCertificates.name:
+            case FarmerLogic.prototype.getAllFarmers.name: {
                 const mspId = clientIdentity.getMSPID();
-                return mspId === this.certBodyOrg || mspId === this.producerOrg
+                return mspId === this.certBodyOrg || mspId === this.producerOrg;
             }
 
             // The certBody, all producers, and the acquirer of a certificate are authorized

@@ -3,6 +3,7 @@ import * as cors from 'cors';
 import * as express from 'express';
 import {createServer} from 'http';
 import {Certificate} from '../../chaincode-typescript/dist/certificate';
+import {Farmer} from '../../chaincode-typescript/src/farmer';
 import {Network} from './network';
 
 const app = express();
@@ -13,7 +14,6 @@ app.use(bodyParser.urlencoded({extended: false}));
 export class Server {
 
     constructor(private _network: Network) {
-
     }
 
     /**
@@ -32,7 +32,13 @@ export class Server {
     private _getListener(): void {
         app.get('/certificate', async (req, res) => {
             const result = await this._network.contract.evaluateTransaction('GetAllCertificates');
-            console.log(result);
+            res.json({
+                success: true,
+                message: JSON.parse(result.toString()),
+            });
+        });
+        app.get('/farmer', async (req, res) => {
+            const result = await this._network.contract.evaluateTransaction('getAllFarmers');
             res.json({
                 success: true,
                 message: JSON.parse(result.toString()),
@@ -62,11 +68,32 @@ export class Server {
                 res.json({certificate: proposal, status: newCertificateCreated.toString()});
             }
         });
+        app.put('/farmer', async (req, res) => {
+            const contract = this._network.contract;
+            const proposal = req.body as Farmer;
+            const farmerExistsBuffer: Buffer = await contract.evaluateTransaction('farmerExists', proposal.id);
+            const farmerExists: boolean = 'true' === farmerExistsBuffer.toString();
+
+            if (farmerExists) {
+                await contract.submitTransaction('updateFarmer', proposal.id, proposal.address, proposal.firstName, proposal.lastName);
+                const newFarmerCreated = await contract.evaluateTransaction('farmerExists', proposal.id);
+                res.json({certificate: proposal, status: newFarmerCreated.toString()});
+            } else {
+                await contract.submitTransaction('createFarmer', proposal.id, proposal.address, proposal.firstName, proposal.lastName);
+                // Report existence back to backend
+                const newFarmerCreated = await contract.evaluateTransaction('farmerExists', proposal.id);
+                res.json({certificate: proposal, status: newFarmerCreated.toString()});
+            }
+        });
     }
 
     private _deleteListener(): void {
         app.delete('/certificate', async (req, res) => {
             await this._network.contract.submitTransaction('DeleteCertificate', req.query.certificate.toString());
+            res.json({certificate: req.query.certificate.toString(), status: 200});
+        });
+        app.delete('/farmer', async (req, res) => {
+            await this._network.contract.submitTransaction('deleteFarmer', req.query.certificate.toString());
             res.json({certificate: req.query.certificate.toString(), status: 200});
         });
     }
