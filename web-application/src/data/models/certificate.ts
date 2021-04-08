@@ -7,9 +7,7 @@ export class Certificate {
     CertNr: number = null;
     StartDate: Date = null;
     EndDate: Date = null;
-    Address: string = null;
     AcquirerID: string = null;
-    AcquirerName: string = null;
     RegistrationNr: number = null;
     CertificateURL: number = null;
     State: string = null;

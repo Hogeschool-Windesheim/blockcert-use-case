@@ -23,8 +23,6 @@ export class CertificateLogic extends Contract {
                 EndDate: '03-30-2021',
                 CertNr: 'certNr',
                 AcquirerID: '4736',
-                AcquirerName: 'henk',
-                Address: 'address',
                 RegistrationNr: 'registrationNr',
                 CertificateURL: 'www.test.nl',
                 State: 'ISSUED',
@@ -35,8 +33,6 @@ export class CertificateLogic extends Contract {
                 EndDate: '03-22-2021',
                 CertNr: 'certNr2',
                 AcquirerID: '1231',
-                AcquirerName: 'Teun',
-                Address: 'address2',
                 RegistrationNr: 'registrationNr2',
                 CertificateURL: 'www.template.nl',
                 State: 'ISSUED',
@@ -57,15 +53,13 @@ export class CertificateLogic extends Contract {
      * @param {string} endDate the end date of the certificate
      * @param {string} certNr the certification number
      * @param {string} acquirerID id of the owner of the certificate
-     * @param {string} acquirerName name of the owner of the certificate
-     * @param {string} address the address of the owner
      * @param {string} registrationNr the id of the certificate body who issued the certificate
      * @param {string} certificateURL link to the official certificate
      * @param {string} state the current state of the certificate
      */
     @Transaction()
     public async CreateCertificate(ctx: Context, id: string, startDate: string, endDate: string, certNr: string, acquirerID: string,
-                                   acquirerName: string, address: string, registrationNr: string, certificateURL: string, state: string): Promise<void> {
+                                   registrationNr: string, certificateURL: string, state: string): Promise<void> {
         const isAuthorized = AccessControll.isAuthorized(this.CreateCertificate.name, ctx.clientIdentity, null);
         if (isAuthorized) {
             Utility.checkStateValidity(state);
@@ -75,8 +69,6 @@ export class CertificateLogic extends Contract {
                 EndDate: endDate,
                 CertNr: certNr,
                 AcquirerID: acquirerID,
-                AcquirerName: acquirerName,
-                Address: address,
                 RegistrationNr: registrationNr,
                 CertificateURL: certificateURL,
                 State: state,
@@ -108,15 +100,13 @@ export class CertificateLogic extends Contract {
      * @param {string} endDate the new end date of the certificate
      * @param {string} certNr the new certification number
      * @param {string} acquirerID id of the new owner of the certificate
-     * @param {string} acquirerName name of the new owner of the certificate
-     * @param {string} address the new address of the owner
      * @param {string} registrationNr the new id of the certificate body who issued the certificate
      * @param {string} certificateURL link to the official certificate
      * @param {string} state the new state of the certificate
      */
     @Transaction()
     public async UpdateCertificate(ctx: Context, id: string, startDate: string, endDate: string, certNr: string, acquirerID: string,
-                                   acquirerName: string, address: string, registrationNr: string, certificateURL: string, state: string): Promise<void> {
+                                   registrationNr: string, certificateURL: string, state: string): Promise<void> {
         const isAuthorized = AccessControll.isAuthorized(this.UpdateCertificate.name, ctx.clientIdentity, null);
         if (isAuthorized) {
             Utility.checkStateValidity(state);
@@ -131,8 +121,6 @@ export class CertificateLogic extends Contract {
                 EndDate: endDate,
                 CertNr: certNr,
                 AcquirerID: acquirerID,
-                AcquirerName: acquirerName,
-                Address: address,
                 RegistrationNr: registrationNr,
                 CertificateURL: certificateURL,
                 State: state,

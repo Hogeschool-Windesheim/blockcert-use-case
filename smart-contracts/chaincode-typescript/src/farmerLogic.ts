@@ -1,7 +1,11 @@
-import {Context, Contract, Returns, Transaction} from 'fabric-contract-api';
+import {Context, Contract, Info, Returns, Transaction} from 'fabric-contract-api';
 import {AccessControll} from './accessControll';
 import {Farmer} from './farmer';
 
+/**
+ * This file describes all operations allowed on farmers, such as creating, updating, deleting, and quering certificates.
+ */
+@Info({title: 'FarmerLogic', description: 'Smart contract for trading certificates'})
 export class FarmerLogic extends Contract {
 
     /**

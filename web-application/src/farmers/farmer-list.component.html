@@ -1,0 +1,32 @@
+<div class="wrapper">
+    <div class="search-box">
+        <mat-form-field appearance="fill">
+            <mat-label>Property to filter on</mat-label>
+            <mat-select [(ngModel)]="currentFilterProperty" name="state">
+                <mat-option *ngFor="let field of searchFields" [value]="field">
+                    {{field}}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+            <mat-label>Value to filter on</mat-label>
+            <input [(ngModel)]="currentFilterValue" (ngModelChange)="onValueChange()" matInput
+                   name="registration-number">
+        </mat-form-field>
+    </div>
+    <mat-accordion multi>
+        <div *ngFor="let farmer of farmers">
+            <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        Farmer {{farmer.id}}
+                    </mat-panel-title>
+                    <mat-panel-description>
+                        {{farmer.firstName + ' ' + farmer.lastName}}
+                    </mat-panel-description>
+                </mat-expansion-panel-header>
+                <farmer-comp [farmer]="farmer"></farmer-comp>
+            </mat-expansion-panel>
+        </div>
+    </mat-accordion>
+</div>

@@ -1,6 +1,6 @@
-certificate-creation-page {
+farmer-creation-page {
 
-    certificate-creation {
+    farmer-creation {
         margin: 10px;
         transition: width 300ms ease;
         width: calc(100% - 20px);
@@ -8,7 +8,7 @@ certificate-creation-page {
         float: left;
     }
 
-    certificate-creation.open {
+    farmer-creation.open {
         width: calc(100% - 206px);
     }
 }

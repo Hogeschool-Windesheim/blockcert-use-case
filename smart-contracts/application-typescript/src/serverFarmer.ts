@@ -32,7 +32,7 @@ export class ServerFarmer {
         app.get('/certificate', async (req, res) => {
             // TODO what to do when action is not allowed, or crashes for whatever reason?
             let result;
-            result = await this._network.contract.evaluateTransaction('queryAcquirer', this._network.userId);
+            result = await this._network.certificateContract.evaluateTransaction('queryAcquirer', this._network.userId);
             res.json({
                 success: true,
                 message: JSON.parse(result.toString()),

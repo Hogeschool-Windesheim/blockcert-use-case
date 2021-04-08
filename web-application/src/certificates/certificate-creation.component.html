@@ -28,21 +28,12 @@
     </mat-form-field>
 
     <mat-form-field appearance="fill">
-        <mat-label>Id of the acquirer</mat-label>
-        <input (change)="onValueChange()" required matInput [(ngModel)]="model.AcquirerID" placeholder="E.g. 5"
-               name="acquirer">
-    </mat-form-field>
-
-    <mat-form-field appearance="fill">
-        <mat-label>Name of the acquirer</mat-label>
-        <input (change)="onValueChange()" required matInput [(ngModel)]="model.AcquirerName" placeholder="E.g. Jason"
-               name="acquirer">
-    </mat-form-field>
-
-    <mat-form-field appearance="fill">
-        <mat-label>Address of the acquirer</mat-label>
-        <input (change)="onValueChange()" required matInput [(ngModel)]="model.Address"
-               name="address">
+        <mat-label>Acquirer of this certificate</mat-label>
+        <mat-select (selectionChange)="onValueChange()" [(ngModel)]="model.AcquirerID" name="state">
+            <mat-option *ngFor="let farmer of farmers" [value]="farmer.id">
+                {{farmer.firstName + ' ' + farmer.lastName + ' ' + farmer.id}}
+            </mat-option>
+        </mat-select>
     </mat-form-field>
 
     <mat-form-field appearance="fill">

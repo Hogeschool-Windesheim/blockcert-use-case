@@ -1,5 +1,4 @@
 import {CertificateLogic} from './certificateLogic';
+import {FarmerLogic} from './farmerLogic';
 
-export {CertificateLogic as CertificateTransferContract} from './certificateLogic';
-
-export const contracts: any[] = [CertificateLogic];
+export const contracts: any[] = [CertificateLogic, FarmerLogic];
