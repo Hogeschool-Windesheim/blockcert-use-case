@@ -8,6 +8,11 @@ import { Wallet, Wallets } from 'fabric-network';
 import * as fs from 'fs';
 import * as path from 'path';
 
+/**
+ * Function to intialize the different organizations according to a folder that is correctly initialized with the
+ * expecte files.
+ * @param filePath Path to the directory containing the configuration.
+ */
 const buildCCPOrg = (filePath: string): Record<string, any> => {
     // load the common connection configuration file
     const ccpPath = path.resolve(__dirname, filePath);
@@ -75,6 +80,11 @@ const buildCCPOrg3 = (): Record<string, any> => {
     return ccp;
 };
 
+/**
+ * Function to construct a wallet based on the Path that is passed by the caller. Note that this function assumes a
+ * valid path to be passed by the caller.
+ * @param walletPath Path to wallet location.
+ */
 const buildWallet = async (walletPath: string): Promise<Wallet> => {
     // Create a new  wallet : Note that wallet is for managing identities.
     let wallet: Wallet;
@@ -89,6 +99,10 @@ const buildWallet = async (walletPath: string): Promise<Wallet> => {
     return wallet;
 };
 
+/**
+ * Helper function to prettify JSON.
+ * @param inputString String to prettify.
+ */
 const prettyJSONString = (inputString: string): string => {
     if (inputString) {
          return JSON.stringify(JSON.parse(inputString), null, 2);
