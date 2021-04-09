@@ -21,8 +21,6 @@ export class AuthenticationService {
         const dialogRef = this.dialog.open(BlockingDialogComponent);
         dialogRef.componentInstance.options.title = 'Trying to log in...';
         this.http.put(url, {username: username, walletKey: walletKey}).subscribe((res: any) => {
-            console.log(res);
-            console.log(res.token);
             sessionStorage.setItem('token', res.token);
             this.tokenChange.next();
             this.dialog.closeAll();

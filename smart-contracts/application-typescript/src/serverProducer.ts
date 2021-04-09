@@ -58,6 +58,10 @@ export class ServerProducer {
                 message: JSON.parse(result.toString()),
             });
         });
+
+        /**
+         * Get path for farmers. Returns all the farmers on the ledger.
+         */
         app.get('/farmer', async (req, res) => {
             const userId = checkTokenAndReturnUser(req, this._tokenToUser);
             if (!userId) {
