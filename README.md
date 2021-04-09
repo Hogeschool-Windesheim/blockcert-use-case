@@ -29,7 +29,7 @@ guide [found here](https://hyperledger-fabric.readthedocs.io/en/release-2.2/gett
 
 ### Install NodeJS and NPM
 Make sure to have NodeJS installed (version 14.16.* at the time of writing) and npm. For this, you may want to use `nvm`, for
-example when using a rolling release [found here](https://github.com/nvm-sh/nvm). To check whether you setup is correct
+example when using a rolling release [found here](https://github.com/nvm-sh/nvm). To check whether your setup is correct
 run the following commands. It's assumed that each command is executed from the resource root folder (i.e. where you
 cloned the repository)
 
@@ -78,7 +78,8 @@ fd9b6d7265e8   hyperledger/fabric-ca:latest                                     
 
 ### Starting the backend
 Next we need to run the backend for the different organizations, i.e. the farmer, certificatino body and the producer.
-This is achieved by running the following commands.
+This is achieved by running the following commands. (If you already did this to test your setup you may want to skip 
+this part).
 
 ```bash
 cd smart-contract/application-typescript
@@ -132,10 +133,42 @@ can be accessed in an up-to-date browser, such as a Chromium based browser. Simp
 
 ![Example of CA login screen](./binaries/images/application/CA-login.png)
 
+#### Registering new users
+By default different users will be generated during the running of the applications. The corresponding secrets that are 
+generated are as follows; For example, the user with ID 1 corresponds to the 
+
+```angular2html
+smart-contracts/application-typescript/dist/wallet
+├── walletCert
+│   ├── admin.id
+│   └── appUser.id
+├── walletFarmer
+│   ├── 1.id
+│   └── admin.id
+└── walletProducer
+    ├── admin.id
+    └── appUser.id
+```
+
+However, the enrollment of new users can be simulated as follows. Effectively, this emulates the process of an administrator
+that creates an account for a new user. We give an example for the Farmer peer. Other organizations do not have this
+functionality, as the POC assumes that these organizations can handle the access control partially via networking.
+As such, all the users share a single 'account' for these organizations.
+
+1. First update the configuration file of the different user, this is achieved by changing the `userId` argument to the 
+identifier that you want. Currently, there are no restrictions/checks on this identity, but this could be automized in 
+   a future iteration.
+2. Run the following commands from the root directory of the repository.
+    ```bash
+    cd smart-contract/application-typescript/
+    yarn enrollFarmer
+    ```
+   
+
 ## Running the tests
 
 For chaincode functionality tests are available, mainly for the interaction with the smart contracts that require
-ABAC accesscontrol. These tests can be run using by `cd`ing into the `smart-contracts/chaincode-typescript` directory
+ABAC access control. These tests can be run using by `cd`ing into the `smart-contracts/chaincode-typescript` directory
 and run `npm test`. This will run the Unit test suite that was written for the chaincode, that utilizes stubbing and spying 
 to check whether behavior is as expected.
 
