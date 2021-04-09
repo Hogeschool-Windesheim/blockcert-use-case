@@ -5,6 +5,7 @@ import {createServer} from 'http';
 import {Certificate} from '../../chaincode-typescript/dist/certificate';
 import {Farmer} from '../../chaincode-typescript/dist/farmer';
 import {Network} from './network';
+import {Identity} from 'fabric-network';
 
 const app = express();
 app.use(cors());
@@ -69,6 +70,19 @@ export class Server {
             await contract.submitTransaction(updateFunction, proposal.id, proposal.address, proposal.firstName, proposal.lastName);
             const newFarmerCreated = await contract.evaluateTransaction('farmerExists', proposal.id);
             res.json({farmer: proposal, status: newFarmerCreated.toString()});
+        });
+        app.put('/login', async (req, res) => {
+            const contract = this._network.farmerContract;
+            const proposal = req.body as {username: string, walletKey: string };
+            // console.log(proposal);
+            const identity: any = await this._network.wallet.get(proposal.username);
+            const decodedWalletKey = unescape(encodeURIComponent(proposal.walletKey));
+            console.log(decodedWalletKey);
+            console.log(proposal.walletKey);
+            console.log(identity.credentials.privateKey);
+            const isEqual = identity.credentials.privateKey.trim() === decodedWalletKey.trim();
+            console.log(isEqual);
+            res.json({status: 'ok'});
         });
     }
 

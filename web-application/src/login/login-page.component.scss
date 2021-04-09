@@ -1,0 +1,22 @@
+div.wrapper {
+    width: 100%;
+    padding-top: 20px;
+    height: calc(100% - 60px);
+    background: lightgreen;
+
+    div.login-div {
+        margin: 20px auto;
+        width: 50%;
+        height: 50%;
+        background: white;
+        box-shadow: 0 3px 5px -1px rgba(0, 0, 0, .2), 0 6px 10px 0 rgba(0, 0, 0, .14), 0 1px 18px 0 rgba(0, 0, 0, .12);
+
+        form {
+            padding: 10px;
+
+            .mat-form-field {
+                width: 100%;
+            }
+        }
+    }
+}
