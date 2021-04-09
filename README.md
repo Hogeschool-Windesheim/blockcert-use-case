@@ -130,7 +130,7 @@ can be accessed in an up-to-date browser, such as a Chromium based browser. Simp
 | Farmer              | 4201       |
 | Producer            | 4202       |
 
-![Example of CA login screen](binaries/images/application/CA-login.png)
+![Example of CA login screen](./binaries/images/application/CA-login.png)
 
 ## Running the tests
 
