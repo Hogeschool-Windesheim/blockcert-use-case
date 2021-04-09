@@ -18,7 +18,7 @@ export class QueryUtils {
         }
         const queryString: any = {};
         queryString.selector = {};
-        queryString.selector.Acquirer = acquirer;
+        queryString.selector.AcquirerID = acquirer;
         const method = self.getQueryResultForQueryString;
         return await method(this.ctx, self, JSON.stringify(queryString));
     }
@@ -91,7 +91,7 @@ export class QueryUtils {
      * @param {resultsIterator} iterator within scope passed in
      * @param {Boolean} isHistory query string created prior to calling this fn
      */
-    async getAllResults(iterator, isHistory) {
+    async getAllResults(iterator, isHistory): Promise<any[]> {
         const allResults = [];
         let res = { done: false, value: null };
 

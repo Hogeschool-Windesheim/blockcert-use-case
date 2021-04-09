@@ -11,6 +11,7 @@
     "scripts": {
         "lint": "tslint -c tslint.json 'src/**/*.ts'",
         "pretest": "npm run lint",
+        "enrollFarmer": "npm run build && node dist/enroll.js --configFile resources/farmer/config.json --jsonPath configuration",
         "start": "npm run build && node dist/appCertificateBody.js --configFile resources/certificate-body/config.json --jsonPath configuration",
         "startProducer": "npm run build && node dist/appProducer.js --configFile resources/producer/config.json --jsonPath configuration",
         "startFarmer": "npm run build && node dist/appFarmer.js --configFile resources/farmer/config.json --jsonPath configuration",

@@ -8,7 +8,7 @@
     "department": "org1.department1",
     "filePath": "../../../../test-network/organizations/peerOrganizations/org1.example.com/connection-org1.json",
     "mspOrg": "Org1MSP",
-    "userId": "appUser",
+    "userId": "1",
     "walletPath": "wallet/walletFarmer",
     "portNumber": "4101"
   }

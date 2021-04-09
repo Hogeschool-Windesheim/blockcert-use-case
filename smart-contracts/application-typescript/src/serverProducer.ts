@@ -2,7 +2,10 @@ import * as bodyParser from 'body-parser';
 import * as cors from 'cors';
 import * as express from 'express';
 import {createServer} from 'http';
+import * as path from 'path';
 import {Network} from './network';
+import {removeSpecialChars, removeSpecialChars2} from './utils/AppUtil';
+import {getArguments, NetworkConfig} from './utils/NetworkConfig';
 
 const app = express();
 app.use(cors());
@@ -42,6 +45,23 @@ export class ServerProducer {
     private _putListener(): void {
         app.put('/certificate', async (req, res) => {
             res.sendStatus(403);
+        });
+        app.put('/login', async (req, res) => {
+            const contract = this._network.farmerContract;
+            const proposal = req.body as { username: string, walletKey: string };
+            const identity: any = await this._network.wallet.get(proposal.username);
+            const str1 = removeSpecialChars(identity.credentials.privateKey);
+            const str2 = removeSpecialChars2(proposal.walletKey);
+
+            if (str1 === str2) {
+                const networkConfiguration: NetworkConfig = getArguments();
+                networkConfiguration.walletPath = path.join(__dirname, networkConfiguration.walletPath);
+                const network = new Network();
+                await network.initialize(networkConfiguration);
+                res.json({status: 'ok'});
+            } else {
+                res.sendStatus(404);
+            }
         });
     }
 
