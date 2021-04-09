@@ -2,9 +2,9 @@ import {ClientIdentity} from 'fabric-shim';
 import {FarmerLogic} from './farmerLogic';
 
 /**
- * This class is used to regulate access controll on different functions performed on the blockchain.
+ * This class is used to regulate access control on different functions performed on the blockchain.
  */
-export class AccessControll {
+export class AccessControl {
     static farmerOrg = 'Org1MSP';
     static certBodyOrg = 'Org2MSP';
     static producerOrg = 'Org3MSP';
@@ -14,17 +14,16 @@ export class AccessControll {
      * @param methodInvoked the method being invoked
      * @param clientIdentity the client invoking the function
      * @param queryValue optional value used to check walletIds
-     * @returns
+     * @returns Boolean representation of the access of the farmer
      */
     static isAuthorized(methodInvoked: string, clientIdentity: ClientIdentity, queryValue: string): boolean {
         switch (methodInvoked) {
-            // Match all funcitons which only the certification body is allowed to perform
+            // Match all functions which only the certification body is allowed to perform
             case FarmerLogic.prototype.createFarmer.name:
             case FarmerLogic.prototype.deleteFarmer.name:
             case FarmerLogic.prototype.updateFarmer.name: {
                 return clientIdentity.getMSPID() === this.certBodyOrg;
             }
-
             case FarmerLogic.prototype.getAllFarmers.name: {
                 const mspId = clientIdentity.getMSPID();
                 return mspId === this.certBodyOrg || mspId === this.producerOrg;

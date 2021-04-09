@@ -26,7 +26,7 @@ export class FarmerService {
         this._configUrl = environment.requestUrl + '/farmer';
         this._authenticationService.tokenChange.subscribe(() => {
             this._httpOptions.headers = new HttpHeaders({
-                'Content-Type': 'application/json', authorization: 'JWT ' + sessionStorage.getItem('token')
+                'Content-Type': 'application/json', authorization: `JWT ${sessionStorage.getItem('token')}`
             });
         });
     }

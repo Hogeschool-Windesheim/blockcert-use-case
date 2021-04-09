@@ -11,4 +11,5 @@ async function main() {
     const server = new Server(path.join(__dirname, networkConfiguration.walletPath));
     server.start(networkConfiguration.portNumber);
 }
+
 main();

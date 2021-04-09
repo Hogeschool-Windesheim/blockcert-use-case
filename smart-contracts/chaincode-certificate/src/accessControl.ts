@@ -2,12 +2,14 @@ import {ClientIdentity} from 'fabric-shim';
 import {CertificateLogic} from './certificateLogic';
 
 /**
- * This class is used to regulate access controll on different functions performed on the blockchain.
+ * This class is used to regulate access control on different functions performed on the blockchain.
  */
-export class AccessControll {
+export class AccessControl {
     static farmerOrg = 'Org1MSP';
     static certBodyOrg = 'Org2MSP';
     static producerOrg = 'Org3MSP';
+
+    static controllingBodies = new Set([AccessControl.certBodyOrg, AccessControl.producerOrg]);
 
     /**
      * Method which returns true iff the client invoking a function is authorized to do so
@@ -18,7 +20,7 @@ export class AccessControll {
      */
     static isAuthorized(methodInvoked: string, clientIdentity: ClientIdentity, queryValue: string): boolean {
         switch (methodInvoked) {
-            // Match all funcitons which only the certification body is allowed to perform
+            // Match all functions which only the certification body is allowed to perform
             case CertificateLogic.prototype.DeleteCertificate.name:
             case CertificateLogic.prototype.UpdateCertificate.name:
             case CertificateLogic.prototype.UpdateState.name:
@@ -43,12 +45,10 @@ export class AccessControll {
             // The certBody, and the acquirer of a certificate are authorized
             case CertificateLogic.prototype.queryAcquirer.name: {
                 const mspId = clientIdentity.getMSPID();
-                if (mspId === this.certBodyOrg) {
-                    return true;
-                }
                 const id = this.getWalletId(clientIdentity.getID());
-                return ((id === queryValue));
+                return mspId === this.certBodyOrg || id === queryValue;
             }
+
             // Functions without auth: ReadCertificate, and CertificateExists
             default: {
                 throw new Error('Authorization on this function not implemented');
@@ -61,7 +61,9 @@ export class AccessControll {
      * however there might exist a more elegant solution.
      * @param idString string representing the id of the invoker
      */
-    private static getWalletId(idString: string) {
+    private static getWalletId(idString: string): string {
+        // Look forward to (?<=CN=) Then any char .* is matched until two or more ':' are encountered (?=:{2,})
+        // return idString.match('(?<=CN=).*?(?=\:{2,})')[0];
         const startIndex = idString.indexOf('CN=') + 3;
         const endIndex = idString.indexOf('::', startIndex);
         return idString.substring(startIndex, endIndex);

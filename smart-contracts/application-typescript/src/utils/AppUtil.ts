@@ -2,6 +2,11 @@ import {Wallet, Wallets} from 'fabric-network';
 import * as fs from 'fs';
 import * as path from 'path';
 
+/**
+ * Function to intialize the different organizations according to a folder that is correctly initialized with the
+ * expecte files.
+ * @param filePath Path to the directory containing the configuration.
+ */
 const buildCCPOrg = (filePath: string): Record<string, any> => {
     // load the common connection configuration file
     const ccpPath = path.resolve(__dirname, filePath);
