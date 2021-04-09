@@ -1,0 +1,14 @@
+farmer-creation-page {
+
+    farmer-creation {
+        margin: 10px;
+        transition: width 300ms ease;
+        width: calc(100% - 20px);
+        display: block;
+        float: left;
+    }
+
+    farmer-creation.open {
+        width: calc(100% - 206px);
+    }
+}

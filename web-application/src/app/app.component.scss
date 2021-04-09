@@ -32,6 +32,14 @@ $header-height: 60px;
         line-height: $header-height;
     }
 
+    > div.title.collide {
+        width: calc(100% - 252px)
+    }
+
+}
+
+.header-bar.collide {
+    width: calc(100% - 186px)
 }
 
 app-certificates {

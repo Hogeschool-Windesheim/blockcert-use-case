@@ -1,7 +1,9 @@
-<form class="example-form">
+<form class="example-form"
+    [class.open]="navigationService.open">
     <mat-form-field appearance="fill">
         <mat-label>Identifier of this certificate</mat-label>
-        <input (change)="onValueChange()" required matInput [(ngModel)]="model.ID" placeholder="E.g. 1" name="ID">
+        <input (change)="onValueChange()" required matInput [(ngModel)]="model.ID" placeholder="E.g. 1" name="ID"
+        [disabled]="disableID">
     </mat-form-field>
 
     <mat-form-field appearance="fill">
@@ -27,21 +29,24 @@
     </mat-form-field>
 
     <mat-form-field appearance="fill">
-        <mat-label>Name of the farmer</mat-label>
-        <input (change)="onValueChange()" required matInput [(ngModel)]="model.Acquirer" placeholder="E.g. 47718"
-               name="acquirer">
-    </mat-form-field>
-
-    <mat-form-field appearance="fill">
-        <mat-label>Address of the farmer</mat-label>
-        <input (change)="onValueChange()" required matInput [(ngModel)]="model.Address" placeholder="E.g. 47718"
-               name="address">
+        <mat-label>Acquirer of this certificate</mat-label>
+        <mat-select (selectionChange)="onValueChange()" [(ngModel)]="model.AcquirerID" name="acquirer-id">
+            <mat-option *ngFor="let farmer of farmers" [value]="farmer.id">
+                {{farmer.firstName + ' ' + farmer.lastName + ' ' + farmer.id}}
+            </mat-option>
+        </mat-select>
     </mat-form-field>
 
     <mat-form-field appearance="fill">
         <mat-label>Registration number</mat-label>
-        <input (change)="onValueChange()" required matInput [(ngModel)]="model.RegistrationNr" placeholder="E.g. 47718"
+        <input (change)="onValueChange()" required matInput [(ngModel)]="model.RegistrationNr"
                name="registration-number">
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+        <mat-label>URL to the official certificate</mat-label>
+        <input (change)="onValueChange()" required matInput [(ngModel)]="model.CertificateURL"
+               name="certificate-url">
     </mat-form-field>
 
     <mat-form-field appearance="fill">
@@ -59,7 +64,8 @@
                 [disabled]="!isValid"
                 (click)="onCreate()">{{update ? 'Update' : 'Create'}}</button>
         <button mat-flat-button *ngIf="delete"
-                class="delete">Delete
+                class="delete"
+                (click)="onDelete()">Delete
         </button>
     </div>
 </form>

@@ -18,15 +18,30 @@ import {MatInputModule} from '@angular/material/input';
 import {MatNativeDateModule, MatOptionModule} from '@angular/material/core';
 import {MatSelectModule} from '@angular/material/select';
 import {CertificateComponent} from '../certificates/certificate.component';
+import {CertificateCreationPageComponent} from '../certificates/certificate-creation-page.component';
+import {NavigationService} from './navigation.service';
+import {BlockingDialogComponent} from '../dialog/dialog.component';
+import {FarmerComponent} from '../farmers/farmer.component';
+import {FarmerCreationComponent} from '../farmers/farmer-creation.component';
+import {FarmerListComponent} from '../farmers/farmer-list.component';
+import {FarmerCreationPageComponent} from '../farmers/farmer-creation-page.component';
+import {LoginPageComponent} from '../login/login-page.component';
 
 
 @NgModule({
     declarations: [
         AppComponent,
-        CertificateListComponent,
-        NavigationBarComponent,
+        BlockingDialogComponent,
+        CertificateComponent,
         CertificateCreationComponent,
-        CertificateComponent
+        CertificateCreationPageComponent,
+        CertificateListComponent,
+        FarmerComponent,
+        FarmerCreationComponent,
+        FarmerCreationPageComponent,
+        FarmerListComponent,
+        LoginPageComponent,
+        NavigationBarComponent
     ],
     imports: [
         AppRoutingModule,
@@ -44,7 +59,7 @@ import {CertificateComponent} from '../certificates/certificate.component';
         MatOptionModule,
         MatSelectModule
     ],
-    providers: [MatDatepickerModule],
+    providers: [MatDatepickerModule, NavigationService],
     bootstrap: [AppComponent]
 })
 export class AppModule {

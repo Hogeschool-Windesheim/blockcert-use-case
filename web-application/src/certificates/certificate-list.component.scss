@@ -2,10 +2,18 @@ certificate-list {
     div.wrapper {
         margin: 10px;
         display: block;
+
+        div.search-box {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+
+            .mat-form-field {
+                margin-right: 8px;
+            }
+        }
     }
 
     mat-accordion {
-        margin: 10px;
 
         div > .mat-expansion-panel.valid {
             background-color: rgba(165, 214, 167, 0.5);

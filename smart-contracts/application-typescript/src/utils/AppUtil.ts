@@ -1,51 +1,15 @@
-/*
- * Copyright IBM Corp. All Rights Reserved.
- *
- * SPDX-License-Identifier: Apache-2.0
- */
-
-import { Wallet, Wallets } from 'fabric-network';
+import {Wallet, Wallets} from 'fabric-network';
 import * as fs from 'fs';
 import * as path from 'path';
 
-const buildCCPOrg1 = (): Record<string, any> => {
+/**
+ * Function to intialize the different organizations according to a folder that is correctly initialized with the
+ * expecte files.
+ * @param filePath Path to the directory containing the configuration.
+ */
+const buildCCPOrg = (filePath: string): Record<string, any> => {
     // load the common connection configuration file
-    const ccpPath = path.resolve(__dirname, '..', '..', '..', '..', 'test-network',
-        'organizations', 'peerOrganizations', 'org1.example.com', 'connection-org1.json');
-    const fileExists = fs.existsSync(ccpPath);
-    if (!fileExists) {
-        throw new Error(`no such file or directory: ${ccpPath}`);
-    }
-    const contents = fs.readFileSync(ccpPath, 'utf8');
-
-    // build a JSON object from the file contents
-    const ccp = JSON.parse(contents);
-
-    console.log(`Loaded the network configuration located at ${ccpPath}`);
-    return ccp;
-};
-
-const buildCCPOrg2 = (): Record<string, any> => {
-    // load the common connection configuration file
-    const ccpPath = path.resolve(__dirname, '..', '..', '..', '..', 'test-network',
-        'organizations', 'peerOrganizations', 'org2.example.com', 'connection-org2.json');
-    const fileExists = fs.existsSync(ccpPath);
-    if (!fileExists) {
-        throw new Error(`no such file or directory: ${ccpPath}`);
-    }
-    const contents = fs.readFileSync(ccpPath, 'utf8');
-
-    // build a JSON object from the file contents
-    const ccp = JSON.parse(contents);
-
-    console.log(`Loaded the network configuration located at ${ccpPath}`);
-    return ccp;
-};
-
-const buildCCPOrg3 = (): Record<string, any> => {
-    // load the common connection configuration file
-    const ccpPath = path.resolve(__dirname, '..', '..', '..', '..', 'test-network',
-        'organizations', 'peerOrganizations', 'org3.example.com', 'connection-org3.json');
+    const ccpPath = path.resolve(__dirname, filePath);
     const fileExists = fs.existsSync(ccpPath);
     if (!fileExists) {
         throw new Error(`no such file or directory: ${ccpPath}`);
@@ -73,18 +37,27 @@ const buildWallet = async (walletPath: string): Promise<Wallet> => {
     return wallet;
 };
 
-const prettyJSONString = (inputString: string): string => {
-    if (inputString) {
-         return JSON.stringify(JSON.parse(inputString), null, 2);
-    } else {
-         return inputString;
+export function removeSpecialChars(stringToConvert: string): string {
+    return stringToConvert.replace(/\r?\n|\r/g, '');
+}
+
+export function removeSpecialChars2(stringToConvert: string): string {
+    return stringToConvert.replace(/\\r?\\n|\\r/g, '');
+}
+
+export function checkTokenAndReturnUser(req: any, tokenToUser: { [token: string]: string }): string {
+    const authorizationHeader = req.headers.authorization;
+    if (!authorizationHeader) {
+        throw Error('No header provided');
     }
-};
+    const token = authorizationHeader.slice(4);
+    if (!tokenToUser[token]) {
+        throw Error('No user found for this token');
+    }
+    return tokenToUser[token];
+}
 
 export {
-    buildCCPOrg1,
-    buildCCPOrg2,
-    buildCCPOrg3,
+    buildCCPOrg,
     buildWallet,
-    prettyJSONString,
 };

@@ -61,6 +61,7 @@
         "no-string-literal": false,
         "no-switch-case-fall-through": true,
         "no-trailing-whitespace": false,
+        "no-unused-expression": [true, "allow-fast-null-checks"],
         "no-var-requires": false,
         "object-literal-key-quotes": [
             true,

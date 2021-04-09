@@ -1,0 +1,15 @@
+{
+  "version": "0.0.1",
+  "interface": "farmer",
+  "configuration": {
+    "chaincodeName": "basic",
+    "channelName": "mychannel",
+    "caName": "ca.org1.example.com",
+    "department": "org1.department1",
+    "filePath": "../../../../test-network/organizations/peerOrganizations/org1.example.com/connection-org1.json",
+    "mspOrg": "Org1MSP",
+    "userId": "2",
+    "walletPath": "wallet/walletFarmer",
+    "portNumber": "4101"
+  }
+}
