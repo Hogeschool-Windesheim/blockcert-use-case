@@ -7,6 +7,7 @@ import {environment} from '../../environments/environment';
 import {MatDialog} from '@angular/material/dialog';
 import {BlockingDialogComponent} from '../../dialog/dialog.component';
 import {Farmer} from '../models/farmer';
+import {AuthenticationService} from '../../login/authentication.service';
 
 @Injectable({
     providedIn: 'root'
@@ -21,8 +22,13 @@ export class FarmerService {
         })
     };
 
-    constructor(private http: HttpClient, public dialog: MatDialog) {
+    constructor(private http: HttpClient, public dialog: MatDialog, private _authenticationService: AuthenticationService) {
         this._configUrl = environment.requestUrl + '/farmer';
+        this._authenticationService.tokenChange.subscribe(() => {
+            this._httpOptions.headers = new HttpHeaders({
+                'Content-Type': 'application/json', authorization: 'JWT ' + sessionStorage.getItem('token')
+            });
+        });
     }
 
     async save(farmer: Farmer): Promise<any> {
@@ -38,7 +44,7 @@ export class FarmerService {
 
     getAll(): ReplaySubject<Farmer[]> {
         this._farmers = {};
-        this.http.get<ServerResponse<Farmer>>(this._configUrl).subscribe((data) => {
+        this.http.get<ServerResponse<Farmer>>(this._configUrl, this._httpOptions).subscribe((data) => {
             _.forEach(data.message, (farmer) => this._deserialize(farmer.Record));
             this._getAll$.next(_.values(this._farmers));
         });
