@@ -1,0 +1,34 @@
+div.wrapper {
+    width: 100%;
+    padding-top: 20px;
+    height: calc(100% - 60px);
+    background: rgba(141, 248, 224, 0.2);
+
+    div.login-div {
+        margin: 20px auto;
+        width: 50%;
+        height: 50%;
+        max-height: 230px;
+        background: white;
+        box-shadow: 0 3px 5px -1px rgba(0, 0, 0, .2), 0 6px 10px 0 rgba(0, 0, 0, .14), 0 1px 18px 0 rgba(0, 0, 0, .12);
+
+        form {
+            padding: 10px;
+
+            .mat-form-field {
+                width: 100%;
+            }
+
+            div.button-div {
+                button.login {
+                    background-color: rgba(0, 117, 97, 0.5);
+                    color: white;
+                }
+                button.login[disabled] {
+                    background-color: darkgrey;
+                    color: grey;
+                }
+            }
+        }
+    }
+}

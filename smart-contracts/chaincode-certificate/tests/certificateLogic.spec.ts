@@ -30,8 +30,6 @@ const testingCertificate: Certificate = {
     EndDate: '1/1/2021',
     CertNr: '1',
     AcquirerID: '42',
-    AcquirerName: 'Test',
-    Address: 'TestStreet',
     RegistrationNr: '1',
     CertificateURL: 'https://org1.example.com/some_document.pdf',
     State: 'VALID',
@@ -55,8 +53,8 @@ describe('Test SmartContract Ledger Initialization', () => {
 
 describe('Test creation of certificates', () => {
     const callCreate = (certificate: Certificate) => certLogic.CreateCertificate(contextMock, certificate.ID,
-        certificate.StartDate, certificate.EndDate, certificate.CertNr, certificate.AcquirerID, certificate.AcquirerName,
-        certificate.Address, certificate.RegistrationNr, certificate.CertificateURL, certificate.State);
+        certificate.StartDate, certificate.EndDate, certificate.CertNr, certificate.AcquirerID, certificate.RegistrationNr,
+        certificate.CertificateURL, certificate.State);
 
     it('Unauthorized test', async () => {
         accessControlMock.callsFake(isUnauthorizedSpy);
@@ -123,8 +121,8 @@ describe('Test updating certificates', () => {
     const createCallUpdate = (certificate: Certificate, certificateLogic: CertificateLogic = certLogic) => {
         return () =>
             certificateLogic.UpdateCertificate(contextMock, certificate.ID,
-                certificate.StartDate, certificate.EndDate, certificate.CertNr, certificate.AcquirerID, certificate.AcquirerName,
-                certificate.Address, certificate.RegistrationNr, certificate.CertificateURL, certificate.State);
+                certificate.StartDate, certificate.EndDate, certificate.CertNr, certificate.AcquirerID,
+                certificate.RegistrationNr, certificate.CertificateURL, certificate.State);
     };
 
     it('Check unauthorized access', async () => {
@@ -221,12 +219,10 @@ describe('Test Update certificate state', () => {
         EndDate: '1/1/2021',
         CertNr: '1',
         AcquirerID: '42',
-        AcquirerName: 'Test',
-        Address: 'TestStreet',
         RegistrationNr: '1',
         CertificateURL: 'https://org1.example.com/some_document.pdf',
         State: 'REVOKED',
-    };
+    } as Certificate;
 
     it('Check unauthorized access', async () => {
         accessControlMock.callsFake(isUnauthorizedSpy);

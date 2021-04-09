@@ -2,7 +2,8 @@
     [class.open]="navigationService.open">
     <mat-form-field appearance="fill">
         <mat-label>Identifier of this certificate</mat-label>
-        <input (change)="onValueChange()" required matInput [(ngModel)]="model.ID" placeholder="E.g. 1" name="ID">
+        <input (change)="onValueChange()" required matInput [(ngModel)]="model.ID" placeholder="E.g. 1" name="ID"
+        [disabled]="disableID">
     </mat-form-field>
 
     <mat-form-field appearance="fill">

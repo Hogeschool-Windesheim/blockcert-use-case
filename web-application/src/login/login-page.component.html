@@ -1,0 +1,24 @@
+<div class="wrapper">
+    <div class="login-div">
+        <form class="example-form">
+            <mat-form-field appearance="fill">
+                <mat-label>Username</mat-label>
+                <input required matInput [(ngModel)]="username" name="username">
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+                <mat-label>Wallet-key</mat-label>
+                <input required matInput [(ngModel)]="walletKey" name="walletkey">
+            </mat-form-field>
+
+            <div class="button-div">
+                <button mat-flat-button
+                        class="login"
+                        [disabled]="!username || !walletKey"
+                        (click)="onLogin()">Login
+                </button>
+            </div>
+        </form>
+
+    </div>
+</div>

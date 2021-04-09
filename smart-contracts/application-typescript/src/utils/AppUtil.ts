@@ -1,10 +1,4 @@
-/*
- * Copyright IBM Corp. All Rights Reserved.
- *
- * SPDX-License-Identifier: Apache-2.0
- */
-
-import { Wallet, Wallets } from 'fabric-network';
+import {Wallet, Wallets} from 'fabric-network';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -105,11 +99,19 @@ const buildWallet = async (walletPath: string): Promise<Wallet> => {
  */
 const prettyJSONString = (inputString: string): string => {
     if (inputString) {
-         return JSON.stringify(JSON.parse(inputString), null, 2);
+        return JSON.stringify(JSON.parse(inputString), null, 2);
     } else {
-         return inputString;
+        return inputString;
     }
 };
+
+export function removeSpecialChars(stringToConvert: string): string {
+    return stringToConvert.replace(/\r?\n|\r/g, '');
+}
+
+export function removeSpecialChars2(stringToConvert: string): string {
+    return stringToConvert.replace(/\\r?\\n|\\r/g, '');
+}
 
 export {
     buildCCPOrg,

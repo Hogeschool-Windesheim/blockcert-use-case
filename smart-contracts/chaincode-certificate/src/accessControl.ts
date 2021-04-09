@@ -63,6 +63,9 @@ export class AccessControl {
      */
     private static getWalletId(idString: string): string {
         // Look forward to (?<=CN=) Then any char .* is matched until two or more ':' are encountered (?=:{2,})
-        return idString.match('(?<=CN=).*?(?=\:{2,})')[0];
+        // return idString.match('(?<=CN=).*?(?=\:{2,})')[0];
+        const startIndex = idString.indexOf('CN=') + 3;
+        const endIndex = idString.indexOf('::', startIndex);
+        return idString.substring(startIndex, endIndex);
     }
 }

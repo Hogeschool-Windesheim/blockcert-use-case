@@ -22,6 +22,9 @@ export class CertificateCreationComponent implements OnInit {
     @Input()
     delete = false;
 
+    @Input()
+    disableID = false;
+
     farmers: Farmer[] = [];
     jsonThing = JSON.stringify;
     states = [{type: 'ISSUED'}, {type: 'REVOKED'}, {type: 'EXPIRED'}];

@@ -25,6 +25,7 @@ import {FarmerComponent} from '../farmers/farmer.component';
 import {FarmerCreationComponent} from '../farmers/farmer-creation.component';
 import {FarmerListComponent} from '../farmers/farmer-list.component';
 import {FarmerCreationPageComponent} from '../farmers/farmer-creation-page.component';
+import {LoginPageComponent} from '../login/login-page.component';
 
 
 @NgModule({
@@ -39,6 +40,7 @@ import {FarmerCreationPageComponent} from '../farmers/farmer-creation-page.compo
         FarmerCreationComponent,
         FarmerCreationPageComponent,
         FarmerListComponent,
+        LoginPageComponent,
         NavigationBarComponent
     ],
     imports: [

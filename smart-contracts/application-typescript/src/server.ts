@@ -2,9 +2,12 @@ import * as bodyParser from 'body-parser';
 import * as cors from 'cors';
 import * as express from 'express';
 import {createServer} from 'http';
-import {Certificate} from '../../chaincode-typescript/dist/certificate';
-import {Farmer} from '../../chaincode-typescript/dist/farmer';
+import * as path from 'path';
+import {Certificate} from '../../chaincode-certificate/dist/certificate';
+import {Farmer} from '../../chaincode-farmer/dist/farmer';
 import {Network} from './network';
+import {removeSpecialChars, removeSpecialChars2} from './utils/AppUtil';
+import {getArguments, NetworkConfig} from './utils/NetworkConfig';
 
 const app = express();
 app.use(cors());
@@ -69,6 +72,23 @@ export class Server {
             await contract.submitTransaction(updateFunction, proposal.id, proposal.address, proposal.firstName, proposal.lastName);
             const newFarmerCreated = await contract.evaluateTransaction('farmerExists', proposal.id);
             res.json({farmer: proposal, status: newFarmerCreated.toString()});
+        });
+        app.put('/login', async (req, res) => {
+            const contract = this._network.farmerContract;
+            const proposal = req.body as { username: string, walletKey: string };
+            const identity: any = await this._network.wallet.get(proposal.username);
+            const str1 = removeSpecialChars(identity.credentials.privateKey);
+            const str2 = removeSpecialChars2(proposal.walletKey);
+
+            if (str1 === str2) {
+                const networkConfiguration: NetworkConfig = getArguments();
+                networkConfiguration.walletPath = path.join(__dirname, networkConfiguration.walletPath);
+                const network = new Network();
+                await network.initialize(networkConfiguration);
+                res.json({status: 'ok'});
+            } else {
+                res.sendStatus(404);
+            }
         });
     }
 
