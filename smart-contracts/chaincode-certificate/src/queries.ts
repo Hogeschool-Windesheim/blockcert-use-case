@@ -1,6 +1,7 @@
 import {Context} from 'fabric-contract-api';
 import {Iterators} from 'fabric-shim';
 
+// TODO: Write indices for the queries that are performed to reduce workload
 export class QueryUtils {
 
     ctx: Context;
@@ -83,6 +84,7 @@ export class QueryUtils {
      * @param {String} queryString the query string created prior to calling this fn
      */
     async getQueryResultForQueryString(ctx, self, queryString): Promise<string[]> {
+        // TODO: Use pagination, as this will only give a pre-configured maximum number of data pieces back!
         const resultsIterator = await ctx.stub.getQueryResult(queryString);
         return await self.getAllResults(resultsIterator, false);
     }
@@ -97,7 +99,6 @@ export class QueryUtils {
     async getAllResults(iterator: Iterators.StateQueryIterator, isHistory): Promise<string[]> {
         const allResults = [];
         let res = { done: false, value: null };
-
         while (true) {
             res = await iterator.next();
             const jsonRes: any = {};
@@ -124,7 +125,6 @@ export class QueryUtils {
                 await iterator.close();
                 return allResults;
             }
-
         }  // while true
     }
 }

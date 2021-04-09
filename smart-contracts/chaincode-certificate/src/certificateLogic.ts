@@ -16,7 +16,6 @@ export class CertificateLogic extends Contract {
             EndDate: '03-30-2021',
             CertNr: 'certNr',
             AcquirerID: '4736',
-
             RegistrationNr: 'registrationNr',
             CertificateURL: 'www.test.nl',
             State: 'ISSUED',
@@ -27,7 +26,6 @@ export class CertificateLogic extends Contract {
             EndDate: '03-22-2021',
             CertNr: 'certNr2',
             AcquirerID: '1231',
-
             RegistrationNr: 'registrationNr2',
             CertificateURL: 'www.template.nl',
             State: 'ISSUED',

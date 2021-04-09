@@ -1,5 +1,5 @@
 import {Context, Contract, Info, Returns, Transaction} from 'fabric-contract-api';
-import {AccessControll} from './accessControll';
+import {AccessControl} from './accessControl';
 import {Farmer} from './farmer';
 import {QueryUtil} from './queries';
 
@@ -19,7 +19,7 @@ export class FarmerLogic extends Contract {
      */
     @Transaction()
     public async createFarmer(ctx: Context, id: string, address: string, firstName: string, lastName: string): Promise<void> {
-        const isAuthorized = AccessControll.isAuthorized(this.createFarmer.name, ctx.clientIdentity, null);
+        const isAuthorized = AccessControl.isAuthorized(this.createFarmer.name, ctx.clientIdentity, null);
         if (isAuthorized) {
             const farmer: Farmer = new Farmer(id, address, firstName, lastName);
             await ctx.stub.putState(id, Buffer.from(JSON.stringify(farmer)));
@@ -38,7 +38,7 @@ export class FarmerLogic extends Contract {
      */
     @Transaction()
     public async updateFarmer(ctx: Context, id: string, address: string, firstName: string, lastName: string): Promise<void> {
-        const isAuthorized = AccessControll.isAuthorized(this.createFarmer.name, ctx.clientIdentity, null);
+        const isAuthorized = AccessControl.isAuthorized(this.createFarmer.name, ctx.clientIdentity, null);
         if (isAuthorized) {
             const exists = await this.farmerExists(ctx, id);
             if (!exists) {
@@ -58,7 +58,7 @@ export class FarmerLogic extends Contract {
      */
     @Transaction()
     public async deleteFarmer(ctx: Context, id: string): Promise<void> {
-        const isAuthorized = AccessControll.isAuthorized(this.deleteFarmer.name, ctx.clientIdentity, null);
+        const isAuthorized = AccessControl.isAuthorized(this.deleteFarmer.name, ctx.clientIdentity, null);
         if (isAuthorized) {
             const exists = await this.farmerExists(ctx, id);
             if (!exists) {
@@ -80,7 +80,7 @@ export class FarmerLogic extends Contract {
     @Transaction(false)
     @Returns('string')
     public async getFarmerByID(ctx: Context, id: string): Promise<string[]> {
-        const isAuthorized = AccessControll.isAuthorized(this.getFarmerByID.name, ctx.clientIdentity, id);
+        const isAuthorized = AccessControl.isAuthorized(this.getFarmerByID.name, ctx.clientIdentity, id);
         if (isAuthorized) {
             const query = new QueryUtil(ctx);
             const allResults = await query.queryKeyByFarmerID(id);
@@ -114,7 +114,7 @@ export class FarmerLogic extends Contract {
     @Transaction(false)
     @Returns('string')
     public async getAllFarmers(ctx: Context): Promise<string> {
-        const isAuthorized = AccessControll.isAuthorized(this.getAllFarmers.name, ctx.clientIdentity, null);
+        const isAuthorized = AccessControl.isAuthorized(this.getAllFarmers.name, ctx.clientIdentity, null);
         if (isAuthorized) {
             const allResults = [];
             // range query with empty string for startKey and endKey does an open-ended query of all farmers in the chaincode namespace.
