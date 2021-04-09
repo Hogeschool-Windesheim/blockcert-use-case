@@ -1,0 +1,38 @@
+<form class="example-form"
+    [class.open]="navigationService.open">
+    <mat-form-field appearance="fill">
+        <mat-label>Identifier of the farmer</mat-label>
+        <input (change)="onValueChange()" required matInput [(ngModel)]="model.id" placeholder="E.g. 1" name="id"
+        [disabled]="disableID">
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+        <mat-label>Address of the farmer number</mat-label>
+        <input (change)="onValueChange()" required matInput [(ngModel)]="model.address" placeholder="E.g. Kerklaan 1"
+               name="farmer-address">
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+        <mat-label>Firstname of the farmer</mat-label>
+        <input (change)="onValueChange()" required matInput [(ngModel)]="model.firstName" placeholder="E.g. Hans"
+               name="farmer-firstname">
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+        <mat-label>Lastname of the farmer</mat-label>
+        <input (change)="onValueChange()" required matInput [(ngModel)]="model.lastName" placeholder="E.g. van den Broek"
+               name="farmer-lastname">
+    </mat-form-field>
+
+    <div class="button-div">
+        <button mat-flat-button
+                class="update"
+                [class.valid]="isValid"
+                [disabled]="!isValid"
+                (click)="onCreate()">{{update ? 'Update' : 'Create'}}</button>
+        <button mat-flat-button *ngIf="delete"
+                class="delete"
+                (click)="onDelete()">Delete
+        </button>
+    </div>
+</form>

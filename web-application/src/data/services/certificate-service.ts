@@ -23,7 +23,7 @@ export class CertificateService {
     };
 
     constructor(private http: HttpClient, public dialog: MatDialog) {
-        this._configUrl = environment.requestUrl;
+        this._configUrl = environment.requestUrl + '/certificate';
     }
 
     async save(certificate: Certificate): Promise<any> {

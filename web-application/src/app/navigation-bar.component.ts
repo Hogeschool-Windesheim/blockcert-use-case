@@ -1,5 +1,4 @@
 import {Component} from '@angular/core';
-import {Router} from '@angular/router';
 import {NavigationService} from './navigation.service';
 
 export interface NavigationItem {
@@ -14,8 +13,11 @@ export interface NavigationItem {
 })
 export class NavigationBarComponent {
     show = false;
-    navigationItems: NavigationItem[] = [{text: 'Create new certificate', route: '/create-certificate'},
-        {text: 'List of certificates', route: '/certificate-list'}];
+    navigationItems: NavigationItem[] = [
+        {text: 'Create new certificate', route: '/create-certificate'},
+        {text: 'Create new farmer', route: '/create-farmer'},
+        {text: 'List of certificates', route: '/certificate-list'},
+        {text: 'List of farmers', route: '/farmer-list'}];
 
     constructor(private _navigationService: NavigationService) {
     }

@@ -30,7 +30,7 @@ export class ServerProducer {
 
     private _getListener(): void {
         app.get('/certificate', async (req, res) => {
-            const result = await this._network.contract.evaluateTransaction('GetAllCertificates');
+            const result = await this._network.certificateContract.evaluateTransaction('GetAllCertificates');
             console.log(result);
             res.json({
                 success: true,

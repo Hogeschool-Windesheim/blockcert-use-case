@@ -1,0 +1,37 @@
+farmer-list {
+    div.wrapper {
+        margin: 10px;
+        display: block;
+
+        div.search-box {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+
+            .mat-form-field {
+                margin-right: 8px;
+            }
+        }
+    }
+
+    mat-accordion {
+
+        div > .mat-expansion-panel.valid {
+            background-color: rgba(165, 214, 167, 0.5);
+        }
+
+        div > .mat-expansion-panel {
+            background-color: rgba(165, 214, 167, 0.5);
+
+            .mat-expansion-panel-header > span {
+                user-select: none;
+                display: grid;
+                grid-template-columns: 1fr 2fr;
+            }
+        }
+
+        .mat-expansion-panel-body {
+            background-color: white;
+            padding: 16px 24px 16px;
+        }
+    }
+}

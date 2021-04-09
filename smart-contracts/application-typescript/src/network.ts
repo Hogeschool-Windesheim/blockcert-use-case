@@ -4,7 +4,8 @@ import {buildCAClient, enrollAdmin, registerAndEnrollUser} from './utils/CAUtil'
 import {NetworkConfig} from './utils/NetworkConfig';
 
 export class Network {
-    contract: Contract;
+    certificateContract: Contract;
+    farmerContract: Contract;
     userId: string;
     private _ccp: Record<string, any>;
     private _wallet: Wallet;
@@ -28,6 +29,7 @@ export class Network {
         await gateway.connect(this._ccp, gatewayOpts);
         const network = await gateway.getNetwork(config.channelName);
         this.userId = config.userId;
-        this.contract = network.getContract(config.chaincodeName);
+        this.certificateContract = network.getContract(config.chaincodeName, 'CertificateLogic');
+        this.farmerContract = network.getContract('farmer', 'FarmerLogic');
     }
 }
