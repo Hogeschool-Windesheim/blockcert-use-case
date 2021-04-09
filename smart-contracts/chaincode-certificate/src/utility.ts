@@ -23,10 +23,10 @@ export class Utility {
      * @returns Date corresponding to the argument dateString.
      */
     public static stringToDate(dateString: string): Date {
-        try {
-            return moment(dateString, 'MM-DD-YYYY').toDate();
-        } catch {
+        const momen = moment(dateString, 'MM-DD-YYYY');
+        if (!momen.isValid()) {
             throw new Error('Invalid date format');
         }
+        return momen.toDate();
     }
 }
