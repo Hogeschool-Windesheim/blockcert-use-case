@@ -10,6 +10,11 @@ export class Network {
     wallet: Wallet;
     private _ccp: Record<string, any>;
 
+    /**
+     * Function to handle the enrollment of a new user. Currently the implementation relies on the chaincode to
+     * handle ill formed requests.
+     * @param options Network configuration containing a description of the user that is to be generated.
+     */
     async enrollUser(options: NetworkConfig): Promise<void> {
         this._ccp = buildCCPOrg(options.filePath);
         const caClient = buildCAClient(this._ccp, options.caName);
@@ -18,6 +23,10 @@ export class Network {
         await registerAndEnrollUser(caClient, this.wallet, options.mspOrg, options.userId, options.department);
     }
 
+    /**
+     * Function to initialize the application.
+     * @param config Network configuration containing the initialization configuration.
+     */
     async initialize(config: NetworkConfig): Promise<void> {
         await this.enrollUser(config);
         const gateway = new Gateway();

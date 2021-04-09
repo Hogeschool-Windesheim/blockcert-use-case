@@ -8,6 +8,7 @@ import {ReplaySubject} from 'rxjs';
 import {environment} from '../../environments/environment';
 import {MatDialog} from '@angular/material/dialog';
 import {BlockingDialogComponent} from '../../dialog/dialog.component';
+import {AuthenticationService} from '../../login/authentication.service';
 
 @Injectable({
     providedIn: 'root'
@@ -22,8 +23,13 @@ export class CertificateService {
         })
     };
 
-    constructor(private http: HttpClient, public dialog: MatDialog) {
+    constructor(private http: HttpClient, public dialog: MatDialog, private _authenticationService: AuthenticationService) {
         this._configUrl = environment.requestUrl + '/certificate';
+        this._authenticationService.tokenChange.subscribe(() => {
+            this._httpOptions.headers = new HttpHeaders({
+                'Content-Type': 'application/json', authorization: `JWT ${sessionStorage.getItem('token')}`
+            });
+        });
     }
 
     async save(certificate: Certificate): Promise<any> {
@@ -31,6 +37,7 @@ export class CertificateService {
         _.assign(object, {StartDate: certificate.StartDate.toISOString(), EndDate: certificate.EndDate.toISOString()});
         const dialogRef = this.dialog.open(BlockingDialogComponent);
         dialogRef.componentInstance.options.title = 'Creating certificate...';
+        console.log(this._httpOptions);
         this.http.put(this._configUrl, JSON.stringify(object), this._httpOptions).subscribe((res) => {
             dialogRef.componentInstance.options.title = 'Successfully created certificate!';
         }, () => {
@@ -40,7 +47,7 @@ export class CertificateService {
 
     getAll(): ReplaySubject<Certificate[]> {
         this._certificates = {};
-        this.http.get<ServerResponse<Certificate>>(this._configUrl).subscribe((data) => {
+        this.http.get<ServerResponse<Certificate>>(this._configUrl, this._httpOptions).subscribe((data) => {
             _.forEach(data.message, (certificate) => this._deserialize(certificate.Record));
             this._checkIfValid();
             this._getAll$.next(_.values(this._certificates));
