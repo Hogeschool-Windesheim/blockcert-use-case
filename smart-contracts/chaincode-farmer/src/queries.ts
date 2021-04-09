@@ -1,7 +1,7 @@
 import {Context} from 'fabric-contract-api';
 
 // TODO: Write indices for the queries that are performed to reduce workload
-export class QueryUtil {
+export class QueryUtils {
 
     ctx: Context;
     constructor(ctx) {
@@ -14,7 +14,7 @@ export class QueryUtil {
      * @param {any} self within scope passed in
      * @param {string} queryString Query to perform on the state database.
      */
-    async getQueryResultForQueryString(ctx, self: QueryUtil, queryString: string) {
+    async getQueryResultForQueryString(ctx, self: QueryUtils, queryString: string) {
         // TODO: Use pagination, as this will only give a pre-configured maximum number of data pieces back!
         const resultsIterator = await ctx.stub.getQueryResult(queryString);
         return await self.getAllResults(resultsIterator);

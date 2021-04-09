@@ -1,7 +1,7 @@
 import {Context, Contract, Info, Returns, Transaction} from 'fabric-contract-api';
 import {AccessControl} from './accessControl';
 import {Farmer} from './farmer';
-import {QueryUtil} from './queries';
+import {QueryUtils} from './queries';
 
 /**
  * This file describes all operations allowed on farmers, such as creating, updating, deleting, and querying certificates.
@@ -38,7 +38,7 @@ export class FarmerLogic extends Contract {
      */
     @Transaction()
     public async updateFarmer(ctx: Context, id: string, address: string, firstName: string, lastName: string): Promise<void> {
-        const isAuthorized = AccessControl.isAuthorized(this.createFarmer.name, ctx.clientIdentity, null);
+        const isAuthorized = AccessControl.isAuthorized(this.updateFarmer.name, ctx.clientIdentity, null);
         if (isAuthorized) {
             const exists = await this.farmerExists(ctx, id);
             if (!exists) {
@@ -62,7 +62,7 @@ export class FarmerLogic extends Contract {
         if (isAuthorized) {
             const exists = await this.farmerExists(ctx, id);
             if (!exists) {
-                throw new Error(`The certificate ${id} does not exist`);
+                throw new Error(`The farmer ${id} does not exist`);
             }
             return ctx.stub.deleteState(id);
         } else {
@@ -82,7 +82,7 @@ export class FarmerLogic extends Contract {
     public async getFarmerByID(ctx: Context, id: string): Promise<string[]> {
         const isAuthorized = AccessControl.isAuthorized(this.getFarmerByID.name, ctx.clientIdentity, id);
         if (isAuthorized) {
-            const query = new QueryUtil(ctx);
+            const query = new QueryUtils(ctx);
             const allResults = await query.queryKeyByFarmerID(id);
             if (allResults.length === 0) {
                 throw new Error('Could not resolve farmer, ID does not exist.');
@@ -108,7 +108,9 @@ export class FarmerLogic extends Contract {
     }
 
     /**
-     * GetAllCertificates returns all certificates found in the world state.
+     * GetAllCertificates returns all certificates found in the world state. Note that this function is not tested
+     * as this becomes a mocking exercise. To properly test this, preferably a mocking version of hyperledger
+     * functionality is created that allows for dynamic configuration and dispatch.
      * @param {Context} ctx the transaction context
      */
     @Transaction(false)
