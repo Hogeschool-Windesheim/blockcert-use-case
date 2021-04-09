@@ -1,5 +1,6 @@
 import {ClientIdentity} from 'fabric-shim';
 import {FarmerLogic} from './farmerLogic';
+import {msp} from "fabric-shim/bundle";
 
 /**
  * This class is used to regulate access controll on different functions performed on the blockchain.
@@ -29,6 +30,11 @@ export class AccessControll {
                 const mspId = clientIdentity.getMSPID();
                 return mspId === this.certBodyOrg || mspId === this.producerOrg;
             }
+            case FarmerLogic.prototype.getFarmerByID.name:
+                const walletID = this.getWalletId(clientIdentity.getID());
+                const mspID = clientIdentity.getMSPID();
+                // CA body & producer may query the farmers. Otherwise, the farmer is allowed to get its own info.
+                return new Set([this.certBodyOrg, this.producerOrg]).has(mspID) || walletID === queryValue;
             // Functions without auth: ReadCertificate, and CertificateExists
             default: {
                 throw new Error('Authorization on this function not implemented');
