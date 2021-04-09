@@ -73,17 +73,25 @@ export class Server {
         });
         app.put('/login', async (req, res) => {
             const contract = this._network.farmerContract;
-            const proposal = req.body as {username: string, walletKey: string };
-            // console.log(proposal);
+            const proposal = req.body as { username: string, walletKey: string };
             const identity: any = await this._network.wallet.get(proposal.username);
-            const decodedWalletKey = unescape(encodeURIComponent(proposal.walletKey));
-            console.log(decodedWalletKey);
-            console.log(proposal.walletKey);
-            console.log(identity.credentials.privateKey);
-            const isEqual = identity.credentials.privateKey.trim() === decodedWalletKey.trim();
-            console.log(isEqual);
+            const str1 = this._removeSpecialChars(identity.credentials.privateKey);
+            const str2 = this._removeSpecialChars2(proposal.walletKey);
+
+            if (str1 === str2) {
+                // this._network.initialize()
+            }
+
             res.json({status: 'ok'});
         });
+    }
+
+    private _removeSpecialChars(stringToConvert: string): string {
+        return stringToConvert.replace(/\r?\n|\r/g, '');
+    }
+
+    private _removeSpecialChars2(stringToConvert: string): string {
+        return stringToConvert.replace(/\\r?\\n|\\r/g, '');
     }
 
     private _deleteListener(): void {
