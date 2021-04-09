@@ -1,5 +1,7 @@
 import {Context} from 'fabric-contract-api';
+import {Iterators} from 'fabric-shim';
 
+// TODO: Write indices for the queries that are performed to reduce workload
 export class QueryUtils {
 
     ctx: Context;
@@ -11,7 +13,7 @@ export class QueryUtils {
      * Queries the ledger for all certificates with the given acquirer
      * @param {string} acquirer owner of certificate
      */
-    async queryKeyByAcquirer(acquirer: string) {
+    async queryKeyByAcquirer(acquirer: string): Promise<string[]> {
         const self = this;
         if (arguments.length < 1) {
             throw new Error('Incorrect number of arguments. Expecting acquirer name.');
@@ -27,7 +29,7 @@ export class QueryUtils {
      * Queries the ledger for all certificates with the given state
      * @param {string} state the state of a certificate
      */
-    async queryKeyByState(state: string) {
+    async queryKeyByState(state: string): Promise<string[]> {
         const self = this;
         if (arguments.length < 1) {
             throw new Error('Incorrect number of arguments. Expecting state name.');
@@ -44,7 +46,7 @@ export class QueryUtils {
      * @param {string} acquirer the owner of a certificate
      * @param {string} state the state of a certificate
      */
-    async queryByAcquirerAndState(acquirer: string, state: string) {
+    async queryByAcquirerAndState(acquirer: string, state: string): Promise<string[]> {
         const self = this;
         if (arguments.length < 1) {
             throw new Error('Incorrect number of arguments. Expecting state name.');
@@ -61,7 +63,7 @@ export class QueryUtils {
      * Queries the ledger for all certificates with the given registration number
      * @param {string} registrationNr the id of the certificate body which issued a certificate
      */
-    async queryByRegistrationNr(registrationNr: string) {
+    async queryByRegistrationNr(registrationNr: string): Promise<string[]> {
         const self = this;
         if (arguments.length < 1) {
             throw new Error('Incorrect number of arguments. Expecting state name.');
@@ -79,22 +81,24 @@ export class QueryUtils {
      * Function getQueryResultForQueryString
      * @param {Context} ctx the transaction context
      * @param {any} self within scope passed in
-     * @param {String} the query string created prior to calling this fn
+     * @param {String} queryString the query string created prior to calling this fn
      */
-    async getQueryResultForQueryString(ctx, self, queryString) {
+    async getQueryResultForQueryString(ctx, self, queryString): Promise<string[]> {
+        // TODO: Use pagination, as this will only give a pre-configured maximum number of data pieces back!
         const resultsIterator = await ctx.stub.getQueryResult(queryString);
         return await self.getAllResults(resultsIterator, false);
     }
 
     /**
-     * Function getAllResults
-     * @param {resultsIterator} iterator within scope passed in
-     * @param {Boolean} isHistory query string created prior to calling this fn
+     * Function getAllResults to obtain all the certificates that are related to a query. This function
+     * acts as a helper for the query functions of the QueryUtility.
+     * @param {StateQueryIterator} iterator within scope passed onto this function to extract all results.
+     * Note that no size checks are in place, so out-of-memory may occur for a very large result set.
+     * @param {Boolean} isHistory query string created prior to invoking getAllResults.
      */
-    async getAllResults(iterator, isHistory): Promise<any[]> {
+    async getAllResults(iterator: Iterators.StateQueryIterator, isHistory): Promise<string[]> {
         const allResults = [];
         let res = { done: false, value: null };
-
         while (true) {
             res = await iterator.next();
             const jsonRes: any = {};
@@ -121,7 +125,6 @@ export class QueryUtils {
                 await iterator.close();
                 return allResults;
             }
-
         }  // while true
     }
 }

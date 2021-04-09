@@ -1,5 +1,5 @@
 import {Context, Contract, Info, Returns, Transaction} from 'fabric-contract-api';
-import {AccessControll} from './accessControll';
+import {AccessControl} from './accessControl';
 import {Certificate} from './certificate';
 import {QueryUtils} from './queries';
 import {Utility} from './utility';
@@ -9,37 +9,35 @@ import {Utility} from './utility';
  */
 @Info({title: 'CertificateLogic', description: 'Smart contract for trading certificates'})
 export class CertificateLogic extends Contract {
-
+    certificates: Certificate[] = [
+        {
+            ID: '1',
+            StartDate: '03-10-2021',
+            EndDate: '03-30-2021',
+            CertNr: 'certNr',
+            AcquirerID: '4736',
+            RegistrationNr: 'registrationNr',
+            CertificateURL: 'www.test.nl',
+            State: 'ISSUED',
+        },
+        {
+            ID: '2',
+            StartDate: '03-10-2021',
+            EndDate: '03-22-2021',
+            CertNr: 'certNr2',
+            AcquirerID: '1231',
+            RegistrationNr: 'registrationNr2',
+            CertificateURL: 'www.template.nl',
+            State: 'ISSUED',
+        },
+    ];
     /**
      * This function initialized the ledger with some initial data.
      * When moving to production, this will likely have to be altered.
      */
     @Transaction()
     public async InitLedger(ctx: Context): Promise<void> {
-        const certificates: Certificate[] = [
-            {
-                ID: '1',
-                StartDate: '03-10-2021',
-                EndDate: '03-30-2021',
-                CertNr: 'certNr',
-                AcquirerID: '4736',
-                RegistrationNr: 'registrationNr',
-                CertificateURL: 'www.test.nl',
-                State: 'ISSUED',
-            },
-            {
-                ID: '2',
-                StartDate: '03-10-2021',
-                EndDate: '03-22-2021',
-                CertNr: 'certNr2',
-                AcquirerID: '1231',
-                RegistrationNr: 'registrationNr2',
-                CertificateURL: 'www.template.nl',
-                State: 'ISSUED',
-            },
-        ];
-
-        for (const certificate of certificates) {
+        for (const certificate of this.certificates) {
             await ctx.stub.putState(certificate.ID, Buffer.from(JSON.stringify(certificate)));
             console.info(`Certificate ${certificate.ID} initialized`);
         }
@@ -60,7 +58,7 @@ export class CertificateLogic extends Contract {
     @Transaction()
     public async CreateCertificate(ctx: Context, id: string, startDate: string, endDate: string, certNr: string, acquirerID: string,
                                    registrationNr: string, certificateURL: string, state: string): Promise<void> {
-        const isAuthorized = AccessControll.isAuthorized(this.CreateCertificate.name, ctx.clientIdentity, null);
+        const isAuthorized = AccessControl.isAuthorized(this.CreateCertificate.name, ctx.clientIdentity, null);
         if (isAuthorized) {
             Utility.checkStateValidity(state);
             const certificate: Certificate = {
@@ -93,7 +91,10 @@ export class CertificateLogic extends Contract {
         return certificateJSON.toString();
     }
 
-    /** UpdateCertificate updates an existing certificate in the world state with provided parameters.
+    /**
+     * UpdateCertificate updates a pre-existing certificate in the world state with provided parameters.
+     * Requires the request to be performed by an Authorized party, using a valid update state. Otherwise,
+     * Errors are thrown to indicate incorrect invocation.
      * @param {Context} ctx  the transaction context
      * @param {string} id the id of the certificate to be updated
      * @param {string} startDate the new start date of the certificate
@@ -107,7 +108,7 @@ export class CertificateLogic extends Contract {
     @Transaction()
     public async UpdateCertificate(ctx: Context, id: string, startDate: string, endDate: string, certNr: string, acquirerID: string,
                                    registrationNr: string, certificateURL: string, state: string): Promise<void> {
-        const isAuthorized = AccessControll.isAuthorized(this.UpdateCertificate.name, ctx.clientIdentity, null);
+        const isAuthorized = AccessControl.isAuthorized(this.UpdateCertificate.name, ctx.clientIdentity, null);
         if (isAuthorized) {
             Utility.checkStateValidity(state);
             const exists = await this.CertificateExists(ctx, id);
@@ -138,7 +139,7 @@ export class CertificateLogic extends Contract {
      */
     @Transaction()
     public async DeleteCertificate(ctx: Context, id: string): Promise<void> {
-        const isAuthorized = AccessControll.isAuthorized(this.DeleteCertificate.name, ctx.clientIdentity, null);
+        const isAuthorized = AccessControl.isAuthorized(this.DeleteCertificate.name, ctx.clientIdentity, null);
         if (isAuthorized) {
             const exists = await this.CertificateExists(ctx, id);
             if (!exists) {
@@ -151,9 +152,11 @@ export class CertificateLogic extends Contract {
     }
 
     /**
-     * CertificateExists returns true iff certificate with given ID exists in world state.
-     * @param {Context} ctx the transaction context
-     * @param {string} id the id of the certificate for which we are checking if it exists
+     * CertificateExists returns true iff certificate with given ID exists in world state. Note that
+     * this function does not perform access control, and thus requires the caller to invoke this function
+     * after verifying the authorization of a request.
+     * @param {Context} ctx the transaction context.
+     * @param {string} id the id of the certificate for which we are checking if it exists.
      */
     @Transaction(false)
     @Returns('boolean')
@@ -164,13 +167,15 @@ export class CertificateLogic extends Contract {
 
     /**
      * UpdateState updates the state field of certificate with given id in the world state.
+     * Note that ReadCertificate also checks for existence of certificate, as such no access control
+     * checks are performed by this function itself.
      * @param {Context} ctx the transaction context
      * @param {string} id the id of the certificate to be updated
      * @param {string} state the new state of the certificate
      */
     @Transaction()
     public async UpdateState(ctx: Context, id: string, state: string): Promise<void> {
-        const isAuthorized = AccessControll.isAuthorized(this.UpdateState.name, ctx.clientIdentity, null);
+        const isAuthorized = AccessControl.isAuthorized(this.UpdateState.name, ctx.clientIdentity, null);
         if (isAuthorized) {
             Utility.checkStateValidity(state);
             const certificateString = await this.ReadCertificate(ctx, id);
@@ -183,13 +188,15 @@ export class CertificateLogic extends Contract {
     }
 
     /**
-     * GetAllCertificates returns all certificates found in the world state.
+     * GetAllCertificates returns all certificates found in the world state. Note that this function is untested
+     * as testing this becomes a complex mocking exercise. As such, a different testing approach is needed
+     * for this piece of code.
      * @param {Context} ctx the transaction context
      */
     @Transaction(false)
     @Returns('string')
     public async GetAllCertificates(ctx: Context): Promise<string> {
-        const isAuthorized = AccessControll.isAuthorized(this.GetAllCertificates.name, ctx.clientIdentity, null);
+        const isAuthorized = AccessControl.isAuthorized(this.GetAllCertificates.name, ctx.clientIdentity, null);
         if (isAuthorized) {
             const allResults = [];
             // range query with empty string for startKey and endKey does an open-ended query of all certificates in the chaincode namespace.
@@ -221,7 +228,7 @@ export class CertificateLogic extends Contract {
     @Transaction(false)
     @Returns('boolean')
     public async CheckCertificateFromAcquirerIsIssued(ctx: Context, acquirer: string): Promise<boolean> {
-        const isAuthorized = AccessControll.isAuthorized(this.CheckCertificateFromAcquirerIsIssued.name, ctx.clientIdentity, acquirer);
+        const isAuthorized = AccessControl.isAuthorized(this.CheckCertificateFromAcquirerIsIssued.name, ctx.clientIdentity, acquirer);
         if (isAuthorized) {
             const query = new QueryUtils(ctx);
             const queryResults = await query.queryByAcquirerAndState(acquirer, 'ISSUED');
@@ -239,8 +246,8 @@ export class CertificateLogic extends Contract {
      */
     @Transaction(false)
     @Returns('string')
-    public async queryAcquirer(ctx: Context, acquirer: string): Promise<string> {
-        const isAuthorized = AccessControll.isAuthorized(this.queryAcquirer.name, ctx.clientIdentity, acquirer);
+    public async queryAcquirer(ctx: Context, acquirer: string): Promise<string[]> {
+        const isAuthorized = AccessControl.isAuthorized(this.queryAcquirer.name, ctx.clientIdentity, acquirer);
         if (isAuthorized) {
             const query = new QueryUtils(ctx);
             return await query.queryKeyByAcquirer(acquirer);
@@ -256,8 +263,8 @@ export class CertificateLogic extends Contract {
      */
     @Transaction(false)
     @Returns('string')
-    public async queryState(ctx: Context, state: string): Promise<any[]> {
-        const isAuthorized = AccessControll.isAuthorized(this.queryState.name, ctx.clientIdentity, null);
+    public async queryState(ctx: Context, state: string): Promise<string[]> {
+        const isAuthorized = AccessControl.isAuthorized(this.queryState.name, ctx.clientIdentity, null);
         if (isAuthorized) {
             const query = new QueryUtils(ctx);
             return await query.queryKeyByState(state);
@@ -273,8 +280,8 @@ export class CertificateLogic extends Contract {
      */
     @Transaction(false)
     @Returns('string')
-    public async queryRegistrationNr(ctx: Context, registrationNr: string): Promise<string> {
-        const isAuthorized = AccessControll.isAuthorized(this.queryRegistrationNr.name, ctx.clientIdentity, null);
+    public async queryRegistrationNr(ctx: Context, registrationNr: string): Promise<string[]> {
+        const isAuthorized = AccessControl.isAuthorized(this.queryRegistrationNr.name, ctx.clientIdentity, null);
         if (isAuthorized) {
             const query = new QueryUtils(ctx);
             return await query.queryByRegistrationNr(registrationNr);
@@ -286,9 +293,8 @@ export class CertificateLogic extends Contract {
     /**
      * Function which updates all expired certificates in the ledger
      * NOTE: this function rules certificates on the same date still as valid,
-     * it only expires certificates with endDate < currentDate
+     * it only expires certificates with endDate < currentDate.
      * @param ctx the transaction context
-     * @param date the current date
      */
     @Transaction(false)
     public async updateStateAllCertificates(ctx: Context): Promise<void> {

@@ -14,4 +14,5 @@ async function main() {
     const server = new Server(network);
     server.start(networkConfiguration.portNumber);
 }
+
 main();
