@@ -1,13 +1,10 @@
 import {Context, Contract, Info, Returns, Transaction} from 'fabric-contract-api';
 import {AccessControll} from './accessControll';
 import {Farmer} from './farmer';
-import {FarmerQueryUtil} from './queries';
-import ProcessVersions = NodeJS.ProcessVersions;
-import {QueryUtils} from "../../chaincode-certificate/src/queries";
-
+import {QueryUtil} from './queries';
 
 /**
- * This file describes all operations allowed on farmers, such as creating, updating, deleting, and quering certificates.
+ * This file describes all operations allowed on farmers, such as creating, updating, deleting, and querying certificates.
  */
 @Info({title: 'FarmerLogic', description: 'Smart contract for trading certificates'})
 export class FarmerLogic extends Contract {
@@ -85,7 +82,7 @@ export class FarmerLogic extends Contract {
     public async getFarmerByID(ctx: Context, id: string): Promise<string> {
         const isAuthorized = AccessControll.isAuthorized(this.getFarmerByID.name, ctx.clientIdentity, null);
         if (isAuthorized) {
-            const query = new FarmerQueryUtil(ctx);
+            const query = new QueryUtil(ctx);
             const allResults = await query.queryKeyByFarmerID(id);
             if (allResults.length === 0) {
                 throw new Error('Could not resolve farmer, ID does not exist.');

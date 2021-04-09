@@ -35,8 +35,20 @@ export class ServerFarmer {
         app.get('/certificate', async (req, res) => {
             // TODO what to do when action is not allowed, or crashes for whatever reason?
             let result;
-            console.log(this._network.userId);
             result = await this._network.certificateContract.evaluateTransaction('queryAcquirer', this._network.userId);
+            res.json({
+                success: true,
+                message: JSON.parse(result.toString()),
+            });
+        });
+
+        /**
+         * Get farmer information using the userID that was set.
+         */
+        app.get('/farmer', async (req, res) => {
+            // TODO what to do when action is not allowed, or crashes for whatever reason?
+            let result;
+            result = await this._network.farmerContract.evaluateTransaction('getFarmerByID', this._network.userId);
             res.json({
                 success: true,
                 message: JSON.parse(result.toString()),
