@@ -33,6 +33,10 @@ export class Server {
     }
 
     private _getListener(): void {
+
+        /**
+         * Get path for certificates. Returns all the certificates on the ledger.
+         */
         app.get('/certificate', async (req, res) => {
             const result = await this._network.certificateContract.evaluateTransaction('GetAllCertificates');
             res.json({
@@ -40,6 +44,10 @@ export class Server {
                 message: JSON.parse(result.toString()),
             });
         });
+
+        /**
+         * Get path for farmers. Returns all the farmers on the ledger.
+         */
         app.get('/farmer', async (req, res) => {
             const result = await this._network.farmerContract.evaluateTransaction('getAllFarmers');
             res.json({
@@ -50,6 +58,10 @@ export class Server {
     }
 
     private _putListener(): void {
+
+        /**
+         * Put path for certificates. Allow the CA body to create new certificates.
+         */
         app.put('/certificate', async (req, res) => {
             const contract = this._network.certificateContract;
             const proposal = req.body as Certificate;
@@ -62,6 +74,11 @@ export class Server {
             const newCertificateCreated = await contract.evaluateTransaction('CertificateExists', proposal.ID);
             res.json({certificate: proposal, status: newCertificateCreated.toString()});
         });
+
+        /**
+         * Put path for a new farmer. Allows the CA body to create a new farmer. These farmers allow then to be used
+         * in new certificates on the ledger.
+         */
         app.put('/farmer', async (req, res) => {
             const contract = this._network.farmerContract;
             const proposal = req.body as Farmer;
@@ -73,6 +90,10 @@ export class Server {
             const newFarmerCreated = await contract.evaluateTransaction('farmerExists', proposal.id);
             res.json({farmer: proposal, status: newFarmerCreated.toString()});
         });
+
+        /**
+         * Login route, to allow a user on a network to interact from the CA bodies perspective.
+         */
         app.put('/login', async (req, res) => {
             const contract = this._network.farmerContract;
             const proposal = req.body as { username: string, walletKey: string };
@@ -93,10 +114,24 @@ export class Server {
     }
 
     private _deleteListener(): void {
+
+        /**
+         * Delete path for certificates. Only the Certification body is allowed to 'delete' certificates from the ledger.
+         * Note that deletion does not result in the removal of the actual data, as otherwise the ledger could
+         * become inconsistent. For actual removal of data, the organizations would have to create a new genesis block
+         * and remove the old data from disk.
+         */
         app.delete('/certificate', async (req, res) => {
             await this._network.certificateContract.submitTransaction('DeleteCertificate', req.query.certificate.toString());
             res.json({certificate: req.query.certificate.toString(), status: 200});
         });
+
+        /**
+         * Delete path for farmers. Only the Certification body is allowed to 'delete' farmers from the ledger.
+         * Note that deletion does not result in the removal of the actual data, as otherwise the ledger could
+         * become inconsistent. For actual removal of data, the organizations would have to create a new genesis block
+         * and remove the old data from disk.
+         */
         app.delete('/farmer', async (req, res) => {
             await this._network.farmerContract.submitTransaction('deleteFarmer', req.query.farmer.toString());
             res.json({farmer: req.query.farmer.toString(), status: 200});
