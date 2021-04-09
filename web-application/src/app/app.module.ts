@@ -21,17 +21,25 @@ import {CertificateComponent} from '../certificates/certificate.component';
 import {CertificateCreationPageComponent} from '../certificates/certificate-creation-page.component';
 import {NavigationService} from './navigation.service';
 import {BlockingDialogComponent} from '../dialog/dialog.component';
+import {FarmerComponent} from '../farmers/farmer.component';
+import {FarmerCreationComponent} from '../farmers/farmer-creation.component';
+import {FarmerListComponent} from '../farmers/farmer-list.component';
+import {FarmerCreationPageComponent} from '../farmers/farmer-creation-page.component';
 
 
 @NgModule({
     declarations: [
         AppComponent,
-        CertificateListComponent,
-        NavigationBarComponent,
-        CertificateCreationComponent,
+        BlockingDialogComponent,
         CertificateComponent,
+        CertificateCreationComponent,
         CertificateCreationPageComponent,
-        BlockingDialogComponent
+        CertificateListComponent,
+        FarmerComponent,
+        FarmerCreationComponent,
+        FarmerCreationPageComponent,
+        FarmerListComponent,
+        NavigationBarComponent
     ],
     imports: [
         AppRoutingModule,

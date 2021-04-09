@@ -16,16 +16,9 @@ export class Certificate {
     @Property()
     public EndDate: string;
 
-    @Property()
-    public Address: string;
-
     // The acquirer is the owner of the certificate, e.g. a farmer, this is a unique ID for each farmer.
     @Property()
     public AcquirerID: string;
-
-    // This is the name corresponding to the acquirerID, this field does not have to be unique.
-    @Property()
-    public AcquirerName: string;
 
     // The registrationNr indicates the certificate body which issued a certificate.
     @Property()
