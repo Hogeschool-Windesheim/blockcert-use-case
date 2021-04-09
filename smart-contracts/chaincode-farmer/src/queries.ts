@@ -38,7 +38,7 @@ export class QueryUtil {
      * Function getAllResults
      * @param {resultsIterator} iterator within scope passed in
      */
-    async getAllResults(iterator) {
+    async getAllResults(iterator): Promise<any[]> {
         const allResults = [];
         let res = { done: false, value: null };
         while (true) {

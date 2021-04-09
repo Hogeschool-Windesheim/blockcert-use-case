@@ -91,7 +91,7 @@ export class QueryUtils {
      * @param {resultsIterator} iterator within scope passed in
      * @param {Boolean} isHistory query string created prior to calling this fn
      */
-    async getAllResults(iterator, isHistory) {
+    async getAllResults(iterator, isHistory): Promise<any[]> {
         const allResults = [];
         let res = { done: false, value: null };
 

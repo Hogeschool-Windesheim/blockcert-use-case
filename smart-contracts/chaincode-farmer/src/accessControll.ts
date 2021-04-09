@@ -1,6 +1,5 @@
 import {ClientIdentity} from 'fabric-shim';
 import {FarmerLogic} from './farmerLogic';
-import {msp} from "fabric-shim/bundle";
 
 /**
  * This class is used to regulate access controll on different functions performed on the blockchain.

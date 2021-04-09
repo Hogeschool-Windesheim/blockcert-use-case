@@ -79,8 +79,8 @@ export class FarmerLogic extends Contract {
      */
     @Transaction(false)
     @Returns('string')
-    public async getFarmerByID(ctx: Context, id: string): Promise<string> {
-        const isAuthorized = AccessControll.isAuthorized(this.getFarmerByID.name, ctx.clientIdentity, null);
+    public async getFarmerByID(ctx: Context, id: string): Promise<string[]> {
+        const isAuthorized = AccessControll.isAuthorized(this.getFarmerByID.name, ctx.clientIdentity, id);
         if (isAuthorized) {
             const query = new QueryUtil(ctx);
             const allResults = await query.queryKeyByFarmerID(id);
@@ -88,7 +88,7 @@ export class FarmerLogic extends Contract {
                 throw new Error('Could not resolve farmer, ID does not exist.');
             } else {
                 // Return last result, should only be a single result.
-                return allResults[allResults.length - 1];
+                return allResults;
             }
         } else {
             throw new Error('Action not allowed by this user');
