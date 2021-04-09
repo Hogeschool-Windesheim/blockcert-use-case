@@ -18,7 +18,7 @@ export class QueryUtils {
         }
         const queryString: any = {};
         queryString.selector = {};
-        queryString.selector.Acquirer = acquirer;
+        queryString.selector.AcquirerID = acquirer;
         const method = self.getQueryResultForQueryString;
         return await method(this.ctx, self, JSON.stringify(queryString));
     }

@@ -2,10 +2,12 @@ import * as bodyParser from 'body-parser';
 import * as cors from 'cors';
 import * as express from 'express';
 import {createServer} from 'http';
-import {Certificate} from '../../chaincode-typescript/dist/certificate';
-import {Farmer} from '../../chaincode-typescript/dist/farmer';
+import * as path from 'path';
+import {Certificate} from '../../chaincode-certificate/dist/certificate';
+import {Farmer} from '../../chaincode-certificate/dist/farmer';
 import {Network} from './network';
-import {Identity} from 'fabric-network';
+import {removeSpecialChars, removeSpecialChars2} from './utils/AppUtil';
+import {getArguments, NetworkConfig} from './utils/NetworkConfig';
 
 const app = express();
 app.use(cors());
@@ -75,23 +77,19 @@ export class Server {
             const contract = this._network.farmerContract;
             const proposal = req.body as { username: string, walletKey: string };
             const identity: any = await this._network.wallet.get(proposal.username);
-            const str1 = this._removeSpecialChars(identity.credentials.privateKey);
-            const str2 = this._removeSpecialChars2(proposal.walletKey);
+            const str1 = removeSpecialChars(identity.credentials.privateKey);
+            const str2 = removeSpecialChars2(proposal.walletKey);
 
             if (str1 === str2) {
-                // this._network.initialize()
+                const networkConfiguration: NetworkConfig = getArguments();
+                networkConfiguration.walletPath = path.join(__dirname, networkConfiguration.walletPath);
+                const network = new Network();
+                await network.initialize(networkConfiguration);
+                res.json({status: 'ok'});
+            } else {
+                res.sendStatus(404);
             }
-
-            res.json({status: 'ok'});
         });
-    }
-
-    private _removeSpecialChars(stringToConvert: string): string {
-        return stringToConvert.replace(/\r?\n|\r/g, '');
-    }
-
-    private _removeSpecialChars2(stringToConvert: string): string {
-        return stringToConvert.replace(/\\r?\\n|\\r/g, '');
     }
 
     private _deleteListener(): void {
