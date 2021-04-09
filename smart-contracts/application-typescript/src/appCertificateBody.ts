@@ -1,5 +1,4 @@
 import * as path from 'path';
-import {Network} from './network';
 import {Server} from './server';
 import {getArguments, NetworkConfig} from './utils/NetworkConfig';
 
@@ -9,10 +8,7 @@ import {getArguments, NetworkConfig} from './utils/NetworkConfig';
  */
 async function main() {
     const networkConfiguration: NetworkConfig = getArguments();
-    networkConfiguration.walletPath = path.join(__dirname, networkConfiguration.walletPath);
-    const network = new Network();
-    await network.initialize(networkConfiguration);
-    const server = new Server(network);
+    const server = new Server(path.join(__dirname, networkConfiguration.walletPath));
     server.start(networkConfiguration.portNumber);
 }
 
