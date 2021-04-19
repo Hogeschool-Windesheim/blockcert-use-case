@@ -1,16 +1,17 @@
-import {AfterViewInit, Component, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
 import {NavigationEnd, Router} from '@angular/router';
 import {filter} from 'rxjs/operators';
 // @ts-ignore
 import * as _ from 'lodash';
 import {NavigationBarComponent} from './navigation-bar.component';
+import {environment} from '../environments/environment';
 
 @Component({
     selector: 'app-root',
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements AfterViewInit {
+export class AppComponent implements AfterViewInit, OnInit {
     @ViewChild('barComponent')
     navigationBar: NavigationBarComponent;
 
@@ -22,6 +23,11 @@ export class AppComponent implements AfterViewInit {
         this._router.events
             .pipe(filter(event => event instanceof NavigationEnd))
             .subscribe((e: any) => this._setPageState(e));
+    }
+
+    ngOnInit(): void {
+        this.title = (environment as any).headerName;
+        throw new Error('Method not implemented.');
     }
 
     ngAfterViewInit(): void {

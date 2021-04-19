@@ -89,8 +89,8 @@ Then in three different terminals run the following commands, to start up the di
 
 ```bash
 npm start            # Starts the certification bodies backend
-npm startFarmer      # Starts the farmer backend
-npm startProducer    # Starts the producer backend
+npm farmer           # Starts the farmer backend
+npm producer         # Starts the producer backend
 ```
 
 **N.B.** After re-deploying the network, the wallets created by this process will not be deleted. This can result in

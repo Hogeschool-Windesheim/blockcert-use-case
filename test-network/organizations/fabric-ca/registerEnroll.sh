@@ -162,7 +162,6 @@ function createOrg2() {
 
 function createOrg3 {
   infoln "Enrolling the CA admin"
-  errorln "IMPORTANT"
   mkdir -p organizations/peerOrganizations/org3.example.com/
 
   export FABRIC_CA_CLIENT_HOME=${PWD}/organizations/peerOrganizations/org3.example.com/

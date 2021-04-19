@@ -2,13 +2,12 @@
   "version": "0.0.1",
   "interface": "certificate-body",
   "configuration": {
-    "chaincodeName": "basic",
     "channelName": "mychannel",
     "caName": "ca.org2.example.com",
     "department": "org2.department1",
     "filePath": "../../../../test-network/organizations/peerOrganizations/org2.example.com/connection-org2.json",
     "mspOrg": "Org2MSP",
-    "userId": "appUser",
+    "userId": "1",
     "walletPath": "wallet/walletCert",
     "portNumber": "4100"
   }
