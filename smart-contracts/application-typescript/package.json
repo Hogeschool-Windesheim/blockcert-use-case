@@ -15,8 +15,8 @@
         "enrollProducer": "npm run build && node dist/enroll.js --configFile resources/producer/config.json --jsonPath configuration",
         "enrollCertificateBody": "npm run build && node dist/enroll.js --configFile resources/certificate-body/config.json --jsonPath configuration",
         "start": "npm run build && node dist/appCertificateBody.js --configFile resources/certificate-body/config.json --jsonPath configuration",
-        "startProducer": "npm run build && node dist/appProducer.js --configFile resources/producer/config.json --jsonPath configuration",
-        "startFarmer": "npm run build && node dist/appFarmer.js --configFile resources/farmer/config.json --jsonPath configuration",
+        "producer": "npm run build && node dist/appProducer.js --configFile resources/producer/config.json --jsonPath configuration",
+        "farmer": "npm run build && node dist/appFarmer.js --configFile resources/farmer/config.json --jsonPath configuration",
         "build": "tsc",
         "build:watch": "tsc -w",
         "prepublishOnly": "npm run build"

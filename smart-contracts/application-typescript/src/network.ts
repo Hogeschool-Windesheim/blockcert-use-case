@@ -38,7 +38,7 @@ export class Network {
         await gateway.connect(this._ccp, gatewayOpts);
         const network = await gateway.getNetwork(config.channelName);
         this.userId = config.userId;
-        this.certificateContract = network.getContract(config.chaincodeName, 'CertificateLogic');
+        this.certificateContract = network.getContract('certificate', 'CertificateLogic');
         this.farmerContract = network.getContract('farmer', 'FarmerLogic');
     }
 }
