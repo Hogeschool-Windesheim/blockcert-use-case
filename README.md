@@ -77,7 +77,7 @@ fd9b6d7265e8   hyperledger/fabric-ca:latest                                     
 ```
 
 ### Starting the backend
-Next we need to run the backend for the different organizations, i.e. the farmer, certificatino body and the producer.
+Next we need to run the backend for the different organizations, i.e. the farmer, certification body and the producer.
 This is achieved by running the following commands. (If you already did this to test your setup you may want to skip 
 this part).
 
@@ -89,8 +89,8 @@ Then in three different terminals run the following commands, to start up the di
 
 ```bash
 npm start            # Starts the certification bodies backend
-npm farmer           # Starts the farmer backend
-npm producer         # Starts the producer backend
+npm run farmer           # Starts the farmer backend
+npm run producer         # Starts the producer backend
 ```
 
 **N.B.** After re-deploying the network, the wallets created by this process will not be deleted. This can result in
@@ -112,13 +112,13 @@ permissions.
 
 ### Starting the web applications
 Now with the blockchain being deployed and the backend up and running, the front end application can be started. This
-is done by `cd`ing to the `webapplication directory, running `npm install` and running the following three commands in
+is done by `cd`ing to the `webapplication` directory, running `npm install` and running the following three commands in
 different terminals, similar to the previous step.
 
 ```bash
-npm certificate-body # Starts the certification bodies GUI
-npm farmer           # Starts the farmer GUI
-npm producer         # Starts the producer GUI
+npm run certificate-body # Starts the certification bodies GUI
+npm run farmer           # Starts the farmer GUI
+npm run producer         # Starts the producer GUI
 ```
 
 This will result in the different applications to spin up, and start listening on the following ports. The applications
@@ -161,14 +161,14 @@ identifier that you want. Currently, there are no restrictions/checks on this id
 2. Run the following commands from the root directory of the repository.
     ```bash
     cd smart-contract/application-typescript/
-    yarn enrollFarmer
+    npm run enrollFarmer
     ```
    
 
 ## Running the tests
 
 For chaincode functionality tests are available, mainly for the interaction with the smart contracts that require
-ABAC access control. These tests can be run using by `cd`ing into the `smart-contracts/chaincode-typescript` directory
+ABAC access control. These tests can be run using by `cd`ing into the `smart-contracts/chaincode-certificate` directory
 and run `npm test`. This will run the Unit test suite that was written for the chaincode, that utilizes stubbing and spying 
 to check whether behavior is as expected.
 
